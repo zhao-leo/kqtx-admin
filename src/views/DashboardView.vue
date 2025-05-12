@@ -1,112 +1,22 @@
 <template>
-
   <div class="dashboard">
     <div class="head clearfix">
       <h1 class="pulll_left">矿桥东街社区服务数据管理平台</h1>
-      <div class="time" id="showTime">2018/6/12 17:00:12</div>
-
+      <div class="time">{{ currentTime }}</div>
     </div>
     <div class="mainbox">
       <ul class="clearfix nav1">
         <li style="width: 33%">
-          <div class="box">
-            <div class="tit">居民投诉情况</div>
-            <div class="boxnav" id="echart1">
-
-            </div>
-          </div>
-          <div class="box">
-            <div class="tit">重点关注对象</div>
-            <div class="boxnav">
-              <ul class="zjia">
-
-                <li>
-                  <img src="../assets/images/aunt.png">
-                  <h3>王阿姨</h3>
-                  <span>待处理</span>
-                  <span>暂无</span>
-                  <p>北京市门头沟区汤臣一品1栋1单元1号</p>
-
-                </li>
-                <li>
-                  <img src="../assets/images/grandma.png">
-                  <h3>李奶奶</h3>
-                  <span>待处理</span>
-                  <span>暂无</span>
-                  <p>北京市门头沟区汤臣一二品1栋1单元1号</p>
-
-                </li>
-
-                <li>
-                  <img src="../assets/images/miao.png">
-                  <h3>苗叔</h3>
-                  <span>待处理</span>
-                  <span>T-20250113-56</span>
-                  <p>北京市门头沟区汤臣一三品1栋1单元1号</p>
-
-                </li>
-
-                <li>
-                  <img src="../assets/images/grandpa.png">
-                  <h3>马爷爷</h3>
-                  <span>待处理</span>
-                  <span>暂无</span>
-                  <p>北京市门头沟区汤臣一四品1栋1单元1号</p>
-
-                </li>
-              </ul>
-            </div>
-          </div>
-
+          <ComplainSituation />
+          <KeyPeople />
         </li>
         <li style="width: 33%">
-          <div class="box">
-            <div class="boxnav" id="map" style="height:433px;">
-
-
-            </div>
-
-
-          </div>
-          <div class="box">
-            <div class="tit">分类</div>
-            <div class="boxnav" id="echart5"></div>
-          </div>
+          <BaiduMap />
+          <CategoryCount />
         </li>
         <li style="width: 33%">
-
-          <div class="box">
-            <div class="tit">推荐处理方式</div>
-            <div class="boxnav" id="ai_recommend">
-              <div class="ai-recommend-container">
-                <!-- <div class="ai-recommend-title">AI智能分析结果</div> -->
-                <div class="ai-recommend-list">
-                  <div class="ai-item">
-                    <div class="ai-item-category">物业问题</div>
-                    <div class="ai-item-solution">建议由物业专员处理，预计解决周期: 48小时</div>
-                  </div>
-                  <div class="ai-item">
-                    <div class="ai-item-category">噪音扰民</div>
-                    <div class="ai-item-solution">建议由调解员介入，预计解决周期: 72小时</div>
-                  </div>
-                  <div class="ai-item">
-                    <div class="ai-item-category">安全隐患</div>
-                    <div class="ai-item-solution">建议由安全专员紧急处理，预计解决周期: 24小时</div>
-                  </div>
-                  <div class="ai-item">
-                    <div class="ai-item-category">环境卫生</div>
-                    <div class="ai-item-solution">建议由环卫部门处理，预计解决周期: 36小时</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="box">
-            <div class="tit">小程序使用情况</div>
-            <div class="boxnav" id="echart6">
-            </div>
-          </div>
-
+          <RecommendHandle />
+          <MiniProgramUsage />
         </li>
       </ul>
     </div>
@@ -116,24 +26,25 @@
 <script setup>
 import '../assets/panel.css'
 import { ref, onMounted, onUnmounted } from 'vue'
-import * as echarts from 'echarts'
+import ComplainSituation from '@/components/panel/ComplainSituation.vue'
+import KeyPeople from '@/components/panel/KeyPeople.vue'
+import BaiduMap from '@/components/panel/BaiduMap.vue'
+import CategoryCount from '@/components/panel/CategoryCount.vue'
+import RecommendHandle from '@/components/panel/RecommendHandle.vue'
+import MiniProgramUsage from '@/components/panel/MiniProgramUsage.vue'
+
 const currentTime = ref('')
-const echart1 = ref(null)
 
 // 更新时间的函数
 const updateTime = () => {
-  const now = new Date()
-  currentTime.value = now.toLocaleString('zh-CN')
-}
-
-// 初始化投诉情况图表
-const initComplaintChart = () => {
-  const chart = echarts.init(echart1.value)
-  // 这里添加图表配置
-  const option = {
-    // 图表配置将在这里添加
-  }
-  chart.setOption(option)
+  const dt = new Date()
+  const y = dt.getFullYear()
+  const mt = dt.getMonth() + 1
+  const day = dt.getDate()
+  const h = dt.getHours()
+  const m = dt.getMinutes()
+  const s = dt.getSeconds()
+  currentTime.value = `${y}/${mt}/${day} ${h}:${m}:${s}`
 }
 
 let timer
@@ -143,9 +54,6 @@ onMounted(() => {
   updateTime()
   // 设置定时器每秒更新时间
   timer = setInterval(updateTime, 1000)
-
-  // 初始化图表
-  initComplaintChart()
 })
 
 onUnmounted(() => {
@@ -158,13 +66,74 @@ onUnmounted(() => {
 
 <style scoped>
 .dashboard {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  min-height: 100vh;
   background: #000d4a;
   color: #fff;
   font-family: 'Microsoft YaHei';
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.head {
+  height: 60px;
+  background: rgba(0, 24, 106, 0.6);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.head h1 {
+  font-size: 24px;
+  color: #fff;
+}
+
+.time {
+  font-size: 16px;
+  color: #fff;
+}
+
+.mainbox {
+  flex: 1;
+  padding: 10px;
+  overflow: hidden;
+  max-height: calc(100vh - 60px);
+}
+
+.nav1 {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav1>li {
+  padding: 0 5px;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+}
+
+.nav1>li>* {
+  flex: 1;
+  margin-bottom: 10px;
+}
+
+.nav1>li>*:last-child {
+  margin-bottom: 0;
+}
+
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.pulll_left {
+  margin: 0;
+  letter-spacing: 2px;
 }
 </style>
