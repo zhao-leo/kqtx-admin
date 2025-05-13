@@ -9,11 +9,11 @@
     <div class="login-container">
       <div class="login-box">
         <div class="login-tabs">
-          <div class="tab-item" :class="{ active: currentTab === 'password' }" @click="currentTab = 'password'">
-            账号登录
-          </div>
           <div class="tab-item" :class="{ active: currentTab === 'qrcode' }" @click="currentTab = 'qrcode'">
             微信登录
+          </div>
+          <div class="tab-item" :class="{ active: currentTab === 'password' }" @click="currentTab = 'password'">
+            账号登录
           </div>
         </div>
         <div class="tab-content">
@@ -26,11 +26,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import NameAndPassword from '@/components/login/NameAndPassword.vue';
-import WeiXinQRcode from '@/components/login/WeiXinQRcode.vue';
+import { ref } from 'vue'
+import NameAndPassword from '@/components/login/NameAndPassword.vue'
+import WeiXinQRcode from '@/components/login/WeiXinQRcode.vue'
 
-const currentTab = ref('password');
+const currentTab = ref('qrcode')
 </script>
 
 <style scoped>

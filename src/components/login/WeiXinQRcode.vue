@@ -1,57 +1,55 @@
 <template>
   <div class="qrcode-login">
     <div v-if="isLoading" class="loading">
-      <img src="@/assets/images/loading.gif" alt="加载中" class="loading-img">
+      <img src="@/assets/images/loading.gif" alt="加载中" class="loading-img" />
     </div>
     <div v-else class="qrcode-wrapper">
       <div id="wx-qrcode" class="qrcode-box">
         <!-- 微信二维码将在这里显示 -->
       </div>
       <p class="qrcode-tip">请使用微信扫描二维码登录</p>
-      <p class="qrcode-refresh" @click="refreshQRCode">
-        二维码已失效？点击刷新
-      </p>
+      <p class="qrcode-refresh" @click="refreshQRCode">二维码已失效？点击刷新</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 
-const isLoading = ref(false);
-const wx_appid = import.meta.env.VITE_WX_APPID;
+const isLoading = ref(false)
+const wx_appid = import.meta.env.VITE_WX_APPID
 const initWxLogin = () => {
   if (typeof window.WxLogin === 'undefined') {
-    console.error('微信登录 SDK 未加载');
-    return;
+    console.error('微信登录 SDK 未加载')
+    return
   }
 
-  isLoading.value = true;
+  isLoading.value = true
   try {
     new window.WxLogin({
-      self_redirect: true,
-      id: "wx-qrcode",
+      self_redirect: false,
+      id: 'wx-qrcode',
       appid: wx_appid,
-      scope: "snsapi_login",
-      redirect_uri: 'https%3A%2F%2Fpassport.yhd.com%2Fwechat%2Fcallback.do',
-      state: "STATE",
-      style: "black",
-    });
+      scope: 'snsapi_login',
+      redirect_uri: encodeURIComponent('http://localhost:8000/redirect'),
+      state: 'STATE',
+      style: 'black',
+    })
   } catch (error) {
-    console.error('初始化微信登录失败:', error);
+    console.error('初始化微信登录失败:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 const refreshQRCode = () => {
-  isLoading.value = true;
-  initWxLogin();
-};
+  isLoading.value = true
+  initWxLogin()
+}
 
 onMounted(() => {
-  initWxLogin();
-});
+  initWxLogin()
+})
 </script>
 
 <style scoped>

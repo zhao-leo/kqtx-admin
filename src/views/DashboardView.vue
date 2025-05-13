@@ -142,14 +142,14 @@ onUnmounted(() => {
   list-style: none;
 }
 
-.nav1>li {
+.nav1 > li {
   padding: 0 5px;
   height: calc(100vh - 80px);
   display: flex;
   flex-direction: column;
 }
 
-.nav1>li>* {
+.nav1 > li > * {
   flex: 1;
   /* 让每个子元素占用相等的空间 */
   margin-bottom: 10px;
@@ -160,11 +160,11 @@ onUnmounted(() => {
   /* 确保padding和border包含在高度计算中 */
 }
 
-.nav1>li>*:last-child {
+.nav1 > li > *:last-child {
   margin-bottom: 0;
 }
 
-.nav1>li>*:last-child {
+.nav1 > li > *:last-child {
   margin-bottom: 0;
   /* 最后一个组件不需要底部间距 */
 }

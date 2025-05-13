@@ -3,46 +3,44 @@
     <div class="form-header">账号密码登录</div>
     <div class="form-content">
       <div class="input-group">
-        <input type="text" v-model="username" placeholder="请输入用户名" class="login-input">
+        <input type="text" v-model="username" placeholder="请输入用户名" class="login-input" />
       </div>
       <div class="input-group">
-        <input type="password" v-model="password" placeholder="请输入密码" class="login-input">
+        <input type="password" v-model="password" placeholder="请输入密码" class="login-input" />
       </div>
-      <button class="login-btn" @click="handleLogin">
-        登录
-      </button>
+      <button class="login-btn" @click="handleLogin">登录</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
-const username = ref('');
-const password = ref('');
+const router = useRouter()
+const username = ref('')
+const password = ref('')
 
 const handleLogin = async () => {
   if (!username.value || !password.value) {
-    alert('请输入用户名和密码');
-    return;
+    alert('请输入用户名和密码')
+    return
   }
 
   try {
     // TODO: 实现实际的登录逻辑
     console.log('登录信息:', {
       username: username.value,
-      password: password.value
-    });
+      password: password.value,
+    })
 
     // 模拟登录成功
-    router.push('/dashboard');
+    router.push('/dashboard')
   } catch (error) {
-    console.error('登录失败:', error);
-    alert('登录失败，请重试');
+    console.error('登录失败:', error)
+    alert('登录失败，请重试')
   }
-};
+}
 </script>
 
 <style scoped>
