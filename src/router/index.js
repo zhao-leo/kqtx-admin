@@ -19,6 +19,11 @@ const router = createRouter({
       name: 'redirect',
       component: () => import('../views/RedirectView.vue'),
     },
+    {
+      path: '/panel',
+      name: 'panel',
+      component: () => import('../views/PanelView.vue'),
+    }
   ],
 })
 
