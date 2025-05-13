@@ -1,5 +1,8 @@
 <template>
   <div class="phone-list">
+    <div class="add-section">
+      <el-button type="primary" @click="showAddDialog">添加电话</el-button>
+    </div>
     <el-table :data="phoneList" style="width: 100%">
       <el-table-column prop="phone_name" label="姓名">
         <template #default="{ row }">
@@ -17,18 +20,38 @@
 
       <el-table-column label="操作" width="200">
         <template #default="{ row }">
-          <el-button v-if="row.isEdit" type="success" size="small" @click="savePhone(row)" :loading="loading">
+          <el-button
+            v-if="row.isEdit"
+            type="success"
+            size="small"
+            @click="savePhone(row)"
+            :loading="loading"
+          >
             保存
           </el-button>
-          <el-button v-else type="primary" size="small" @click="editPhone(row)">
-            修改
-          </el-button>
+          <el-button v-else type="primary" size="small" @click="editPhone(row)"> 修改 </el-button>
           <el-button type="danger" size="small" @click="deletePhone(row)" :loading="loading">
             删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog v-model="dialogVisible" title="添加新电话" width="500px">
+      <el-form :model="newPhone" label-width="80px">
+        <el-form-item label="姓名">
+          <el-input v-model="newPhone.phone_name" placeholder="请输入姓名" />
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="newPhone.phone_number" placeholder="请输入电话号码" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="addPhone" :loading="loading"> 确定 </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -36,18 +59,29 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useAuthStore } from '../../stores/token.js'
 
 const phoneList = ref([])
 const loading = ref(false)
+const dialogVisible = ref(false)
+const newPhone = ref({
+  phone_name: '',
+  phone_number: '',
+})
 
+const api = import.meta.env.VITE_API_BASE_URL + '/community/phone_number'
+
+const token = useAuthStore().getToken()
+axios.defaults.headers.common['Authorization'] = token
+axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
 // 获取电话列表
 const getPhoneList = async () => {
   try {
     loading.value = true
-    const response = await axios.get('/api/phones')
-    phoneList.value = response.data.data.map(item => ({
+    const response = await axios.get(api)
+    phoneList.value = response.data.data.map((item) => ({
       ...item,
-      isEdit: false
+      isEdit: false,
     }))
   } catch (error) {
     ElMessage.error('获取电话列表失败')
@@ -63,7 +97,7 @@ const editPhone = (row) => {
   // 保存原始数据，用于取消编辑
   row.originalData = {
     phone_name: row.phone_name,
-    phone_number: row.phone_number
+    phone_number: row.phone_number,
   }
 }
 
@@ -71,9 +105,10 @@ const editPhone = (row) => {
 const savePhone = async (row) => {
   try {
     loading.value = true
-    await axios.put(`/api/phones/${row.id}`, {
+    const apiUrl = `${api}?pk=${row.id}`
+    await axios.put(apiUrl, {
       phone_name: row.phone_name,
-      phone_number: row.phone_number
+      phone_number: row.phone_number,
     })
     row.isEdit = false
     delete row.originalData
@@ -95,18 +130,46 @@ const savePhone = async (row) => {
 const deletePhone = async (row) => {
   try {
     await ElMessageBox.confirm('确定要删除这个电话吗？', '提示', {
-      type: 'warning'
+      type: 'warning',
     })
 
     loading.value = true
-    await axios.delete(`/api/phones/${row.id}`)
-    phoneList.value = phoneList.value.filter(item => item.id !== row.id)
+    const apiUrl = `${api}?pk=${row.id}`
+    await axios.delete(apiUrl)
+    phoneList.value = phoneList.value.filter((item) => item.id !== row.id)
     ElMessage.success('删除成功')
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败')
       console.error('删除失败:', error)
     }
+  } finally {
+    loading.value = false
+  }
+}
+const showAddDialog = () => {
+  newPhone.value = {
+    phone_name: '',
+    phone_number: '',
+  }
+  dialogVisible.value = true
+}
+
+const addPhone = async () => {
+  if (!newPhone.value.phone_name || !newPhone.value.phone_number) {
+    ElMessage.warning('请填写完整信息')
+    return
+  }
+
+  try {
+    loading.value = true
+    await axios.post(api, newPhone.value)
+    ElMessage.success('添加成功')
+    dialogVisible.value = false
+    await getPhoneList() // 刷新列表
+  } catch (error) {
+    ElMessage.error('添加失败')
+    console.error('添加失败:', error)
   } finally {
     loading.value = false
   }
@@ -129,5 +192,15 @@ onMounted(() => {
 
 .el-button:first-child {
   margin-left: 0;
+}
+
+.add-section {
+  margin-bottom: 20px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>

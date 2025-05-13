@@ -26,7 +26,7 @@ import WarmNotice from '@/components/adminpanel/WarmNotice.vue'
   border-radius: 4px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   padding: 20px;
-  height: calc(100vh - 40px);
+  flex: 1;
   overflow-y: auto;
 }
 

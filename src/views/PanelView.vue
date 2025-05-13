@@ -24,7 +24,7 @@ watch(
   (path) => {
     currentPanel.value = path.split('/').pop() || 'basic'
   },
-  { immediate: true }
+  { immediate: true },
 )
 </script>
 
@@ -35,8 +35,9 @@ watch(
   background-color: #f5f7fa;
 }
 
-router-view {
+:deep(router-view) {
   flex: 1;
-  padding: 20px;
+  display: flex;
+  margin: 20px;
 }
 </style>

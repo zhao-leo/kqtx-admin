@@ -39,9 +39,9 @@ const router = createRouter({
           path: 'report',
           name: 'panel-report',
           component: () => import('../views/panel/ReportPanel.vue'),
-        }
-      ]
-    }
+        },
+      ],
+    },
   ],
 })
 

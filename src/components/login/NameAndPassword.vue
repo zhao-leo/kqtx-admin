@@ -29,48 +29,39 @@ const handleLogin = async () => {
   if (!username.value || !password.value) {
     ElMessageBox.alert('请输入用户名和密码', '提示', {
       confirmButtonText: '确定',
-      type: 'warning'
+      type: 'warning',
     })
     return
   }
 
   try {
     const formData = new FormData()
-    formData.append('openid', password.value)  // 使用 password 作为 openid
+    formData.append('openid', password.value) // 使用 password 作为 openid
     formData.append('username', username.value)
 
     const response = await axios.post(`${BASEURL}/user/test`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     })
 
     if (response.data.message === 'success') {
-
       const userStore = useAuthStore()
       userStore.setToken(response.data.data.token)
 
       router.push('/panel')
     } else {
-      await ElMessageBox.alert(
-        `登录失败：${response.data.message || '未知错误'}`,
-        '错误',
-        {
-          confirmButtonText: '确定',
-          type: 'error'
-        }
-      )
+      await ElMessageBox.alert(`登录失败：${response.data.message || '未知错误'}`, '错误', {
+        confirmButtonText: '确定',
+        type: 'error',
+      })
     }
   } catch (error) {
     console.error('登录失败:', error)
-    await ElMessageBox.alert(
-      `登录失败：${error.message || '未知错误'}`,
-      '错误',
-      {
-        confirmButtonText: '确定',
-        type: 'error'
-      }
-    )
+    await ElMessageBox.alert(`登录失败：${error.message || '未知错误'}`, '错误', {
+      confirmButtonText: '确定',
+      type: 'error',
+    })
   }
 }
 </script>
