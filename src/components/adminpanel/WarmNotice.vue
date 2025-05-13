@@ -65,13 +65,109 @@ onMounted(() => {
 
 <style scoped>
 .warm-notice {
-  padding: 20px;
+  padding: 25px;
   max-width: 600px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.warm-notice:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.15);
+}
+
+:deep(.el-textarea) {
+  --el-input-text-color: rgba(16, 16, 16, 0.9);
+  color: rgba(24, 24, 24, 0.9);
+}
+
+:deep(.el-textarea__inner) {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(0, 0, 0, 0.9);
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  caret-color: #409EFF;
+}
+
+:deep(.el-textarea__inner:hover) {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:deep(.el-textarea__inner:focus) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #409EFF;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+}
+
+:deep(.el-textarea__inner::placeholder) {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .button-group {
-  margin-top: 20px;
+  margin-top: 25px;
   display: flex;
-  gap: 10px;
+  gap: 15px;
+}
+
+:deep(.el-button) {
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(45deg, #409EFF, #60ACFF);
+  border: none;
+}
+
+:deep(.el-button--primary:hover) {
+  background: linear-gradient(45deg, #60ACFF, #409EFF);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+:deep(.el-button--default) {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+:deep(.el-button--default:hover) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+:deep(.el-button--default:disabled) {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.warm-notice {
+  animation: fadeIn 0.5s ease-out;
 }
 </style>

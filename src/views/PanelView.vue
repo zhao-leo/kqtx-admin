@@ -34,28 +34,58 @@ watch(
 .panel {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+  background: linear-gradient(135deg, #1a2233 0%, #0d1117 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 70%);
+  animation: rotate 60s linear infinite;
 }
 
 :deep(router-view) {
   flex: 1;
   display: flex;
   margin: 20px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* 过渡动画 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-enter-from {
   opacity: 0;
-  transform: translateX(20px);
+  transform: scale(0.95) translateY(10px);
 }
 
 .fade-leave-to {
   opacity: 0;
-  transform: translateX(-20px);
+  transform: scale(0.95) translateY(-10px);
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

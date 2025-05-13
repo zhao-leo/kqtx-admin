@@ -20,13 +20,7 @@
 
       <el-table-column label="操作" width="200">
         <template #default="{ row }">
-          <el-button
-            v-if="row.isEdit"
-            type="success"
-            size="small"
-            @click="savePhone(row)"
-            :loading="loading"
-          >
+          <el-button v-if="row.isEdit" type="success" size="small" @click="savePhone(row)" :loading="loading">
             保存
           </el-button>
           <el-button v-else type="primary" size="small" @click="editPhone(row)"> 修改 </el-button>
@@ -36,7 +30,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog v-model="dialogVisible" title="添加新电话" width="500px">
+    <el-dialog v-model="dialogVisible" title="添加新电话" width="500px" lock-scroll>
       <el-form :model="newPhone" label-width="80px">
         <el-form-item label="姓名">
           <el-input v-model="newPhone.phone_name" placeholder="请输入姓名" />
@@ -131,6 +125,8 @@ const deletePhone = async (row) => {
   try {
     await ElMessageBox.confirm('确定要删除这个电话吗？', '提示', {
       type: 'warning',
+      lockScroll: true,
+      customClass: 'custom-message-box'
     })
 
     loading.value = true
@@ -183,24 +179,215 @@ onMounted(() => {
 
 <style scoped>
 .phone-list {
-  padding: 20px;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.5s ease-out;
+  height: 80vh;
 }
 
-.el-button {
-  margin-left: 10px;
-}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-.el-button:first-child {
-  margin-left: 0;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .add-section {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+}
+
+:deep(.el-button) {
+  margin-left: 12px;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-button:first-child) {
+  margin-left: 0;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(45deg, #409EFF, #60ACFF);
+  border: none;
+}
+
+:deep(.el-button--primary:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+:deep(.el-button--success) {
+  background: linear-gradient(45deg, #67C23A, #85CE61);
+  border: none;
+}
+
+:deep(.el-button--success:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+}
+
+:deep(.el-button--danger) {
+  background: linear-gradient(45deg, #F56C6C, #FF7875);
+  border: none;
+}
+
+:deep(.el-button--danger:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 108, 108, 0.3);
+}
+
+:deep(.el-table) {
+  background: transparent !important;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-table::before) {
+  display: none;
+}
+
+:deep(.el-table--enable-row-hover .el-table__body tr:hover > td) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+:deep(.el-table td),
+:deep(.el-table th) {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+:deep(.el-table th) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  font-weight: 600;
+  color: #000000;
+}
+
+:deep(.el-table__row) {
+  transition: all 0.3s ease;
+}
+
+:deep(.el-table) {
+  --el-table-text-color: rgba(0, 0, 0, 0.9);
+  --el-table-header-text-color: #000000;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+:deep(.el-table span) {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+/* 表格内的输入框样式 */
+:deep(.el-table .el-input__inner) {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #333333;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-table .el-input__inner:focus) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #409EFF;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+}
+
+/* 弹窗样式 */
+:deep(.el-dialog) {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid #eee;
+  margin-top: 15vh !important;
+}
+
+:deep(.el-dialog__title) {
+  color: #333333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid #eee;
+  padding: 20px 24px;
+  margin: 0;
+}
+
+:deep(.el-dialog__body) {
+  padding: 24px;
+  color: #333333;
+}
+
+:deep(.el-form-item__label) {
+  color: #333333;
+}
+
+:deep(.el-input__inner) {
+  color: #333333 !important;
+  background-color: #ffffff !important;
+  border-color: #dcdfe6 !important;
+}
+
+:deep(.el-input__inner:focus) {
+  border-color: #409EFF !important;
+}
+
+:deep(.el-input__inner::placeholder) {
+  color: #909399;
 }
 
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+/* 消息框样式 */
+:deep(.custom-message-box) {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid #eee;
+}
+
+:deep(.custom-message-box .el-message-box__title) {
+  color: #333333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+:deep(.custom-message-box .el-message-box__content) {
+  color: #333333;
+  padding: 20px 0;
+}
+
+:deep(.custom-message-box .el-message-box__btns) {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+:deep(.custom-message-box .el-message-box__btns .el-button) {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+:deep(.custom-message-box .el-overlay) {
+  overflow: hidden;
 }
 </style>
