@@ -5,7 +5,9 @@
 
     <!-- 右侧内容区 -->
     <router-view v-slot="{ Component }">
-      <component :is="Component" />
+      <transition name="fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
     </router-view>
   </div>
 </template>
@@ -24,7 +26,7 @@ watch(
   (path) => {
     currentPanel.value = path.split('/').pop() || 'basic'
   },
-  { immediate: true },
+  { immediate: true }
 )
 </script>
 
@@ -32,12 +34,28 @@ watch(
 .panel {
   display: flex;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
 }
 
 :deep(router-view) {
   flex: 1;
   display: flex;
   margin: 20px;
+}
+
+/* 过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
 }
 </style>
