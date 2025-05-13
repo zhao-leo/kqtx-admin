@@ -128,19 +128,6 @@ onUnmounted(() => {
   color: #fff;
 }
 
-/* .time {
-  padding: 6px 15px;
-height: 32px;
-display: flex;
-align-items: center;
-justify-content: center;
-background: rgba(255, 255, 255, 0.1);
-border: 1px solid rgba(255, 255, 255, 0.2);
-color: #fff;
-border-radius: 4px;
-transition: all 0.3s;
-min-width: 180px;
-}*/
 .mainbox {
   flex: 1;
   padding: 10px;
