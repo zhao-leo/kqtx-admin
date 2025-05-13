@@ -1,28 +1,20 @@
 # kqtx-admin
 
-This template should help get you started developing with Vue 3 in Vite.
+矿桥东街社区前端网页数据大屏+人员和社区信息管理综合页面
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## 初始化项目
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### 开始调试
 
 ```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+### 构建发布版本
 
 ```sh
 npm run build
@@ -32,4 +24,10 @@ npm run build
 
 ```sh
 npm run lint
+```
+
+### 自动格式化
+
+```sh
+npm run format
 ```
