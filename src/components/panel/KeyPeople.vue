@@ -4,7 +4,7 @@
     <div class="boxnav">
       <ul class="zjia">
         <li v-for="person in people" :key="person.name">
-          <img :src="getImageUrl(person.avatar)">
+          <img :src="getImageUrl(person.avatar)" />
           <h3>{{ person.name }}</h3>
           <span>{{ person.status }}</span>
           <span>{{ person.code || '暂无' }}</span>
@@ -25,29 +25,29 @@ export default {
         avatar: 'aunt.png',
         status: '待处理',
         code: '',
-        address: '北京市门头沟区汤臣一品1栋1单元1号'
+        address: '北京市门头沟区汤臣一品1栋1单元1号',
       },
       {
         name: '李奶奶',
         avatar: 'grandma.png',
         status: '待处理',
         code: '',
-        address: '北京市门头沟区汤臣一二品1栋1单元1号'
+        address: '北京市门头沟区汤臣一二品1栋1单元1号',
       },
       {
         name: '苗叔',
         avatar: 'miao.png',
         status: '待处理',
         code: 'T-20250113-56',
-        address: '北京市门头沟区汤臣一三品1栋1单元1号'
+        address: '北京市门头沟区汤臣一三品1栋1单元1号',
       },
       {
         name: '马爷爷',
         avatar: 'grandpa.png',
         status: '待处理',
         code: '',
-        address: '北京市门头沟区汤臣一四品1栋1单元1号'
-      }
+        address: '北京市门头沟区汤臣一四品1栋1单元1号',
+      },
     ]
 
     const getImageUrl = (name) => {
@@ -56,9 +56,9 @@ export default {
 
     return {
       people,
-      getImageUrl
+      getImageUrl,
     }
-  }
+  },
 }
 </script>
 
@@ -80,7 +80,7 @@ export default {
 .boxnav {
   flex: 1;
   padding: 5px 15px 15px;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .zjia li {

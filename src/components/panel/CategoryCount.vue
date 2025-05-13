@@ -20,15 +20,15 @@ export default {
       const option = {
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b}: {c} ({d}%)'
+          formatter: '{a} <br/>{b}: {c} ({d}%)',
         },
         legend: {
           orient: 'horizontal',
           bottom: 0,
           textStyle: {
-            color: '#fff'
+            color: '#fff',
           },
-          data: ['物业问题', '噪音扰民', '安全隐患', '环境卫生', '其他']
+          data: ['物业问题', '噪音扰民', '安全隐患', '环境卫生', '其他'],
         },
         series: [
           {
@@ -40,25 +40,25 @@ export default {
               show: true,
               position: 'outside',
               formatter: '{b}: {d}%',
-              color: '#fff'
+              color: '#fff',
             },
             emphasis: {
               label: {
                 show: true,
                 fontSize: '16',
-                fontWeight: 'bold'
-              }
+                fontWeight: 'bold',
+              },
             },
             data: [
               { value: 35, name: '物业问题' },
               { value: 25, name: '噪音扰民' },
               { value: 20, name: '安全隐患' },
               { value: 15, name: '环境卫生' },
-              { value: 5, name: '其他' }
-            ]
-          }
+              { value: 5, name: '其他' },
+            ],
+          },
         ],
-        color: ['#00ff7f', '#00ffff', '#ff69b4', '#7b68ee', '#ff7f50']
+        color: ['#00ff7f', '#00ffff', '#ff69b4', '#7b68ee', '#ff7f50'],
       }
       myChart.setOption(option)
     }
@@ -78,9 +78,9 @@ export default {
     })
 
     return {
-      chart
+      chart,
     }
-  }
+  },
 }
 </script>
 

@@ -24,23 +24,23 @@ export default {
           axisPointer: {
             type: 'cross',
             label: {
-              backgroundColor: '#6a7985'
-            }
-          }
+              backgroundColor: '#6a7985',
+            },
+          },
         },
         legend: {
           data: ['日活用户', '累计用户'],
           textStyle: {
-            color: '#fff'
+            color: '#fff',
           },
-          top: 0
+          top: 0,
         },
         grid: {
           left: '3%',
           right: '4%',
           bottom: '3%',
           top: '15%',
-          containLabel: true
+          containLabel: true,
         },
         xAxis: [
           {
@@ -49,25 +49,25 @@ export default {
             data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
             axisLine: {
               lineStyle: {
-                color: '#fff'
-              }
-            }
-          }
+                color: '#fff',
+              },
+            },
+          },
         ],
         yAxis: [
           {
             type: 'value',
             axisLine: {
               lineStyle: {
-                color: '#fff'
-              }
+                color: '#fff',
+              },
             },
             splitLine: {
               lineStyle: {
-                color: 'rgba(255,255,255,0.1)'
-              }
-            }
-          }
+                color: 'rgba(255,255,255,0.1)',
+              },
+            },
+          },
         ],
         series: [
           {
@@ -76,12 +76,12 @@ export default {
             smooth: true,
             stack: '总量',
             areaStyle: {
-              opacity: 0.3
+              opacity: 0.3,
             },
             emphasis: {
-              focus: 'series'
+              focus: 'series',
             },
-            data: [120, 132, 101, 134, 90, 230, 210]
+            data: [120, 132, 101, 134, 90, 230, 210],
           },
           {
             name: '累计用户',
@@ -89,14 +89,14 @@ export default {
             smooth: true,
             stack: '总量',
             areaStyle: {
-              opacity: 0.3
+              opacity: 0.3,
             },
             emphasis: {
-              focus: 'series'
+              focus: 'series',
             },
-            data: [220, 382, 491, 634, 790, 1030, 1200]
-          }
-        ]
+            data: [220, 382, 491, 634, 790, 1030, 1200],
+          },
+        ],
       }
       myChart.setOption(option)
     }
@@ -116,9 +116,9 @@ export default {
     })
 
     return {
-      chart
+      chart,
     }
-  }
+  },
 }
 </script>
 

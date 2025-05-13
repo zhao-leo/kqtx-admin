@@ -17,73 +17,71 @@ export default {
 
     const initChart = () => {
       myChart = echarts.init(chart.value)
-      const colors = [
-        '#37A2FF',
-        '#00ff7f',
-        '#FF0087',
-        '#FFBF00',
-        '#56D0E3',
-        '#9FE6B8',
-        '#FFDB5C'
-      ]
+      const colors = ['#37A2FF', '#00ff7f', '#FF0087', '#FFBF00', '#56D0E3', '#9FE6B8', '#FFDB5C']
 
       const option = {
         color: colors,
         tooltip: {
           trigger: 'axis',
           axisPointer: {
-            type: 'shadow'
-          }
+            type: 'shadow',
+          },
         },
         grid: {
           left: '0%',
           right: '4%',
           bottom: '3%',
           top: '3%',
-          containLabel: true
+          containLabel: true,
         },
-        xAxis: [{
-          type: 'category',
-          data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-          axisTick: {
-            alignWithLabel: true
+        xAxis: [
+          {
+            type: 'category',
+            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+            axisTick: {
+              alignWithLabel: true,
+            },
+            axisLine: {
+              lineStyle: {
+                color: '#fff',
+              },
+            },
           },
-          axisLine: {
-            lineStyle: {
-              color: '#fff'
-            }
-          }
-        }],
-        yAxis: [{
-          type: 'value',
-          axisLine: {
-            lineStyle: {
-              color: '#fff'
-            }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            axisLine: {
+              lineStyle: {
+                color: '#fff',
+              },
+            },
+            splitLine: {
+              lineStyle: {
+                color: 'rgba(255,255,255,0.1)',
+              },
+            },
           },
-          splitLine: {
-            lineStyle: {
-              color: 'rgba(255,255,255,0.1)'
-            }
-          }
-        }],
-        series: [{
-          name: '投诉数量',
-          type: 'bar',
-          barWidth: '60%',
-          itemStyle: {
-            borderRadius: [8, 8, 0, 0]
-          },
-          data: [10, 52, 20, 34, 39, 30, 20].map(value => ({
-            value,
-            // 为每个柱子随机选择一个颜色
+        ],
+        series: [
+          {
+            name: '投诉数量',
+            type: 'bar',
+            barWidth: '60%',
             itemStyle: {
-              color: function () {
-                return colors[Math.floor(Math.random() * colors.length)];
-              }()
-            }
-          }))
-        }]
+              borderRadius: [8, 8, 0, 0],
+            },
+            data: [10, 52, 20, 34, 39, 30, 20].map((value) => ({
+              value,
+              // 为每个柱子随机选择一个颜色
+              itemStyle: {
+                color: (function () {
+                  return colors[Math.floor(Math.random() * colors.length)]
+                })(),
+              },
+            })),
+          },
+        ],
       }
       myChart.setOption(option)
     }
@@ -103,9 +101,9 @@ export default {
     })
 
     return {
-      chart
+      chart,
     }
-  }
+  },
 }
 </script>
 
