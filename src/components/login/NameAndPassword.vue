@@ -16,29 +16,61 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { ElMessageBox } from 'element-plus'
+import { useAuthStore } from '@/stores/token'
 
 const router = useRouter()
 const username = ref('')
 const password = ref('')
+const BASEURL = import.meta.env.VITE_API_BASE_URL || ''
 
 const handleLogin = async () => {
   if (!username.value || !password.value) {
-    alert('请输入用户名和密码')
+    ElMessageBox.alert('请输入用户名和密码', '提示', {
+      confirmButtonText: '确定',
+      type: 'warning'
+    })
     return
   }
 
   try {
-    // TODO: 实现实际的登录逻辑
-    console.log('登录信息:', {
-      username: username.value,
-      password: password.value,
+    const formData = new FormData()
+    formData.append('openid', password.value)  // 使用 password 作为 openid
+    formData.append('username', username.value)
+
+    const response = await axios.post(`${BASEURL}/user/test`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     })
 
-    // 模拟登录成功
-    router.push('/dashboard')
+    if (response.data.message === 'success') {
+
+      const userStore = useAuthStore()
+      userStore.setToken(response.data.data.token)
+
+      router.push('/panel')
+    } else {
+      await ElMessageBox.alert(
+        `登录失败：${response.data.message || '未知错误'}`,
+        '错误',
+        {
+          confirmButtonText: '确定',
+          type: 'error'
+        }
+      )
+    }
   } catch (error) {
     console.error('登录失败:', error)
-    alert('登录失败，请重试')
+    await ElMessageBox.alert(
+      `登录失败：${error.message || '未知错误'}`,
+      '错误',
+      {
+        confirmButtonText: '确定',
+        type: 'error'
+      }
+    )
   }
 }
 </script>
