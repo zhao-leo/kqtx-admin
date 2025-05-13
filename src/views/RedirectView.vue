@@ -25,25 +25,17 @@ const validateLogin = async (code) => {
       router.replace('/dashboard')
     } else {
       // 使用 ElMessageBox 替代 alert
-      await ElMessageBox.alert(
-        `登录失败，请重试: ${response.data.message || '未知错误'}`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          type: 'error'
-        }
-      )
+      await ElMessageBox.alert(`登录失败，请重试: ${response.data.message || '未知错误'}`, '提示', {
+        confirmButtonText: '确定',
+        type: 'error',
+      })
       router.replace('/login')
     }
   } catch (error) {
-    await ElMessageBox.alert(
-      `登录失败，请重试: ${error.message || '未知错误'}`,
-      '提示',
-      {
-        confirmButtonText: '确定',
-        type: 'error'
-      }
-    )
+    await ElMessageBox.alert(`登录失败，请重试: ${error.message || '未知错误'}`, '提示', {
+      confirmButtonText: '确定',
+      type: 'error',
+    })
     router.replace('/login')
   } finally {
     loading.value = false

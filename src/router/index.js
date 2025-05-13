@@ -19,6 +19,29 @@ const router = createRouter({
       name: 'redirect',
       component: () => import('../views/RedirectView.vue'),
     },
+    {
+      path: '/panel',
+      name: 'panel',
+      component: () => import('../views/PanelView.vue'),
+      redirect: '/panel/basic',
+      children: [
+        {
+          path: 'basic',
+          name: 'panel-basic',
+          component: () => import('../views/panel/BasicPanel.vue'),
+        },
+        {
+          path: 'show',
+          name: 'panel-show',
+          component: () => import('../views/panel/ShowPanel.vue'),
+        },
+        {
+          path: 'report',
+          name: 'panel-report',
+          component: () => import('../views/panel/ReportPanel.vue'),
+        },
+      ],
+    },
   ],
 })
 
