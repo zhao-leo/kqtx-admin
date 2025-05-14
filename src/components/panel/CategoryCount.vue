@@ -8,34 +8,55 @@
 <script>
 import * as echarts from 'echarts'
 import { onMounted, ref, onUnmounted } from 'vue'
+import axios from 'axios'
 
 export default {
   name: 'CategoryCount',
   setup() {
     const chart = ref(null)
     let myChart = null
+    const loading = ref(false)
+    let timer = null  // 添加定时器变量
 
-    const initChart = () => {
-      myChart = echarts.init(chart.value)
+    // 获取数据
+    const fetchData = async () => {
+      try {
+        loading.value = true
+        const api = import.meta.env.VITE_API_BASE_URL + '/analysis/status'
+
+        const response = await axios.get(api)
+
+        const categories = response.data.data.categories
+        // 将数据转换为图表所需格式
+        const chartData = Object.entries(categories).map(([name, value]) => ({
+          name,
+          value
+        }))
+
+        // 获取所有类别名称用于图例
+        const legendData = Object.keys(categories)
+
+        // 更新图表
+        updateChart(chartData, legendData)
+      } catch (error) {
+        console.error('获取数据失败:', error)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const updateChart = (data) => {
       const option = {
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b}: {c} ({d}%)',
-        },
-        legend: {
-          orient: 'horizontal',
-          bottom: 0,
-          textStyle: {
-            color: '#fff',
-          },
-          data: ['物业问题', '噪音扰民', '安全隐患', '环境卫生', '其他'],
+          formatter: '{b}: {c}个 ({d}%)'  // 修改提示框格式
         },
         series: [
           {
             name: '问题类型',
             type: 'pie',
             radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
+            avoidLabelOverlap: true,
             label: {
               show: true,
               position: 'outside',
@@ -45,17 +66,11 @@ export default {
             emphasis: {
               label: {
                 show: true,
-                fontSize: '16',
+                fontSize: '16',  // 增大强调时的字体大小
                 fontWeight: 'bold',
               },
             },
-            data: [
-              { value: 35, name: '物业问题' },
-              { value: 25, name: '噪音扰民' },
-              { value: 20, name: '安全隐患' },
-              { value: 15, name: '环境卫生' },
-              { value: 5, name: '其他' },
-            ],
+            data: data,
           },
         ],
         color: ['#00ff7f', '#00ffff', '#ff69b4', '#7b68ee', '#ff7f50'],
@@ -63,14 +78,32 @@ export default {
       myChart.setOption(option)
     }
 
+    const initChart = () => {
+      myChart = echarts.init(chart.value)
+      // 初始化后立即获取数据
+      fetchData()
+    }
+
+
     onMounted(() => {
       initChart()
+      // 添加定时刷新
+      timer = setInterval(() => {
+        fetchData()
+      }, 5000) // 每5秒刷新一次
+
       window.addEventListener('resize', () => {
         myChart?.resize()
       })
     })
 
     onUnmounted(() => {
+      // 清除定时器
+      if (timer) {
+        clearInterval(timer)
+        timer = null
+      }
+
       window.removeEventListener('resize', () => {
         myChart?.resize()
       })

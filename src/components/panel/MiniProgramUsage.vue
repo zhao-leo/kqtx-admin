@@ -8,15 +8,34 @@
 <script>
 import * as echarts from 'echarts'
 import { onMounted, ref, onUnmounted } from 'vue'
+import axios from 'axios'
 
 export default {
   name: 'MiniProgramUsage',
   setup() {
     const chart = ref(null)
     let myChart = null
+    const loading = ref(false)
+    let timer = null
 
-    const initChart = () => {
-      myChart = echarts.init(chart.value)
+    // 获取数据
+    const fetchData = async () => {
+      try {
+        loading.value = true
+        const api = import.meta.env.VITE_API_BASE_URL + '/analysis/view-stats'
+
+        const response = await axios.get(api)
+
+        const chartData = response.data.data.data.reverse()
+        updateChart(chartData)
+      } catch (error) {
+        console.error('获取数据失败:', error)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const updateChart = (data) => {
       const option = {
         color: ['#00ff7f', '#00ffff'],
         tooltip: {
@@ -29,7 +48,7 @@ export default {
           },
         },
         legend: {
-          data: ['日活用户', '累计用户'],
+          data: ['日活用户', '注册用户'],
           textStyle: {
             color: '#fff',
           },
@@ -46,7 +65,7 @@ export default {
           {
             type: 'category',
             boundaryGap: false,
-            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+            data: data.map(item => item.date),
             axisLine: {
               lineStyle: {
                 color: '#fff',
@@ -81,10 +100,10 @@ export default {
             emphasis: {
               focus: 'series',
             },
-            data: [120, 132, 101, 134, 90, 230, 210],
+            data: data.map(item => item.view_count),
           },
           {
-            name: '累计用户',
+            name: '注册用户',
             type: 'line',
             smooth: true,
             stack: '总量',
@@ -94,21 +113,36 @@ export default {
             emphasis: {
               focus: 'series',
             },
-            data: [220, 382, 491, 634, 790, 1030, 1200],
+            data: data.map(item => item.enrollment_count),
           },
         ],
       }
       myChart.setOption(option)
     }
 
+    const initChart = () => {
+      myChart = echarts.init(chart.value)
+      fetchData()
+    }
+
     onMounted(() => {
       initChart()
+      // 添加自动刷新
+      timer = setInterval(() => {
+        fetchData()
+      }, 5000)  // 每5秒刷新一次
+
       window.addEventListener('resize', () => {
         myChart?.resize()
       })
     })
 
     onUnmounted(() => {
+      if (timer) {
+        clearInterval(timer)
+        timer = null
+      }
+
       window.removeEventListener('resize', () => {
         myChart?.resize()
       })

@@ -8,17 +8,35 @@
 <script>
 import * as echarts from 'echarts'
 import { onMounted, ref, onUnmounted } from 'vue'
+import axios from 'axios'
 
 export default {
   name: 'ComplainSituation',
   setup() {
     const chart = ref(null)
     let myChart = null
+    const loading = ref(false)
+    let timer = null  // 添加定时器变量
 
-    const initChart = () => {
-      myChart = echarts.init(chart.value)
-      const colors = ['#37A2FF', '#00ff7f', '#FF0087', '#FFBF00', '#56D0E3', '#9FE6B8', '#FFDB5C']
+    // 获取数据
+    const fetchData = async () => {
+      try {
+        loading.value = true
+        const api = import.meta.env.VITE_API_BASE_URL + '/analysis/status'
 
+        const response = await axios.get(api)
+        console.log('获取数据:', response.data)
+        const status = response.data.data.status
+        updateChart(status)
+      } catch (error) {
+        console.error('获取数据失败:', error)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const updateChart = (data) => {
+      const colors = ['#37A2FF', '#00ff7f', '#FF0087', '#FFBF00']
       const option = {
         color: colors,
         tooltip: {
@@ -37,7 +55,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+            data: ['未处理', '处理中', '已处理', '待回访'],
             axisTick: {
               alignWithLabel: true,
             },
@@ -71,29 +89,44 @@ export default {
             itemStyle: {
               borderRadius: [8, 8, 0, 0],
             },
-            data: [10, 52, 20, 34, 39, 30, 20].map((value) => ({
-              value,
-              // 为每个柱子随机选择一个颜色
-              itemStyle: {
-                color: (function () {
-                  return colors[Math.floor(Math.random() * colors.length)]
-                })(),
-              },
-            })),
+            data: [
+              { value: data.unhandled, itemStyle: { color: colors[0] } },
+              { value: data.handling, itemStyle: { color: colors[1] } },
+              { value: data.handled, itemStyle: { color: colors[2] } },
+              { value: data.waiting_callback, itemStyle: { color: colors[3] } }
+            ],
           },
         ],
       }
       myChart.setOption(option)
     }
 
+    const initChart = () => {
+      myChart = echarts.init(chart.value)
+      // 初始化后立即获取数据
+      fetchData()
+    }
+
     onMounted(() => {
       initChart()
+      // 添加自动刷新
+      timer = setInterval(() => {
+        fetchData()
+      }, 5000)  // 每5秒刷新一次
+
       window.addEventListener('resize', () => {
         myChart?.resize()
       })
     })
 
+
     onUnmounted(() => {
+      // 清除定时器
+      if (timer) {
+        clearInterval(timer)
+        timer = null
+      }
+
       window.removeEventListener('resize', () => {
         myChart?.resize()
       })
