@@ -16,7 +16,7 @@ export default {
     const chart = ref(null)
     let myChart = null
     const loading = ref(false)
-    let timer = null  // 添加定时器变量
+    let timer = null // 添加定时器变量
 
     // 获取数据
     const fetchData = async () => {
@@ -30,7 +30,7 @@ export default {
         // 将数据转换为图表所需格式
         const chartData = Object.entries(categories).map(([name, value]) => ({
           name,
-          value
+          value,
         }))
 
         // 获取所有类别名称用于图例
@@ -49,7 +49,7 @@ export default {
       const option = {
         tooltip: {
           trigger: 'item',
-          formatter: '{b}: {c}个 ({d}%)'  // 修改提示框格式
+          formatter: '{b}: {c}个 ({d}%)', // 修改提示框格式
         },
         series: [
           {
@@ -66,7 +66,7 @@ export default {
             emphasis: {
               label: {
                 show: true,
-                fontSize: '16',  // 增大强调时的字体大小
+                fontSize: '16', // 增大强调时的字体大小
                 fontWeight: 'bold',
               },
             },
@@ -83,7 +83,6 @@ export default {
       // 初始化后立即获取数据
       fetchData()
     }
-
 
     onMounted(() => {
       initChart()

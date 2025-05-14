@@ -33,9 +33,7 @@ import CommunityShow from '@/components/adminpanel/CommunityShow.vue'
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom right,
-      rgba(255, 255, 255, 0.1),
-      rgba(255, 255, 255, 0.05));
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
   pointer-events: none;
   border-radius: 8px;
 }

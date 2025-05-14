@@ -65,7 +65,7 @@ export default {
           {
             type: 'category',
             boundaryGap: false,
-            data: data.map(item => item.date),
+            data: data.map((item) => item.date),
             axisLine: {
               lineStyle: {
                 color: '#fff',
@@ -100,7 +100,7 @@ export default {
             emphasis: {
               focus: 'series',
             },
-            data: data.map(item => item.view_count),
+            data: data.map((item) => item.view_count),
           },
           {
             name: '注册用户',
@@ -113,7 +113,7 @@ export default {
             emphasis: {
               focus: 'series',
             },
-            data: data.map(item => item.enrollment_count),
+            data: data.map((item) => item.enrollment_count),
           },
         ],
       }
@@ -130,7 +130,7 @@ export default {
       // 添加自动刷新
       timer = setInterval(() => {
         fetchData()
-      }, 5000)  // 每5秒刷新一次
+      }, 5000) // 每5秒刷新一次
 
       window.addEventListener('resize', () => {
         myChart?.resize()

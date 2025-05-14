@@ -1,6 +1,12 @@
 <template>
-  <el-menu class="sidebar-menu" :default-active="activeIndex" background-color="#545c64" text-color="#fff"
-    active-text-color="#ffd04b" :router="true">
+  <el-menu
+    class="sidebar-menu"
+    :default-active="activeIndex"
+    background-color="#545c64"
+    text-color="#fff"
+    active-text-color="#ffd04b"
+    :router="true"
+  >
     <el-menu-item-group index="1">
       <el-menu-item index="/panel/basic">
         <el-icon>
@@ -79,7 +85,7 @@ const activeIndex = ref('/panel/basic')
 
 .el-menu-item.is-active {
   background: rgba(255, 255, 255, 0.1) !important;
-  border-right: 3px solid #409EFF;
+  border-right: 3px solid #409eff;
 }
 
 .el-menu-item .el-icon {
@@ -90,7 +96,7 @@ const activeIndex = ref('/panel/basic')
 
 .el-menu-item:hover .el-icon {
   transform: scale(1.1);
-  color: #409EFF;
+  color: #409eff;
 }
 
 .el-menu-item span {

@@ -20,7 +20,13 @@
 
       <el-table-column label="操作" width="200">
         <template #default="{ row }">
-          <el-button v-if="row.isEdit" type="success" size="small" @click="savePhone(row)" :loading="loading">
+          <el-button
+            v-if="row.isEdit"
+            type="success"
+            size="small"
+            @click="savePhone(row)"
+            :loading="loading"
+          >
             保存
           </el-button>
           <el-button v-else type="primary" size="small" @click="editPhone(row)"> 修改 </el-button>
@@ -126,7 +132,7 @@ const deletePhone = async (row) => {
     await ElMessageBox.confirm('确定要删除这个电话吗？', '提示', {
       type: 'warning',
       lockScroll: true,
-      customClass: 'custom-message-box'
+      customClass: 'custom-message-box',
     })
 
     loading.value = true
@@ -219,7 +225,7 @@ onMounted(() => {
 }
 
 :deep(.el-button--primary) {
-  background: linear-gradient(45deg, #409EFF, #60ACFF);
+  background: linear-gradient(45deg, #409eff, #60acff);
   border: none;
 }
 
@@ -229,7 +235,7 @@ onMounted(() => {
 }
 
 :deep(.el-button--success) {
-  background: linear-gradient(45deg, #67C23A, #85CE61);
+  background: linear-gradient(45deg, #67c23a, #85ce61);
   border: none;
 }
 
@@ -239,7 +245,7 @@ onMounted(() => {
 }
 
 :deep(.el-button--danger) {
-  background: linear-gradient(45deg, #F56C6C, #FF7875);
+  background: linear-gradient(45deg, #f56c6c, #ff7875);
   border: none;
 }
 
@@ -301,7 +307,7 @@ onMounted(() => {
 
 :deep(.el-table .el-input__inner:focus) {
   background: rgba(255, 255, 255, 0.08);
-  border-color: #409EFF;
+  border-color: #409eff;
   box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
 }
 
@@ -342,7 +348,7 @@ onMounted(() => {
 }
 
 :deep(.el-input__inner:focus) {
-  border-color: #409EFF !important;
+  border-color: #409eff !important;
 }
 
 :deep(.el-input__inner::placeholder) {

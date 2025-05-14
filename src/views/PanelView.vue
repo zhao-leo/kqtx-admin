@@ -26,7 +26,7 @@ watch(
   (path) => {
     currentPanel.value = path.split('/').pop() || 'basic'
   },
-  { immediate: true }
+  { immediate: true },
 )
 </script>
 

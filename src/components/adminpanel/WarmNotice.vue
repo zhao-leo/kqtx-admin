@@ -72,7 +72,9 @@ onMounted(() => {
   border-radius: 12px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .warm-notice:hover {
@@ -95,7 +97,7 @@ onMounted(() => {
   font-size: 14px;
   line-height: 1.6;
   resize: vertical;
-  caret-color: #409EFF;
+  caret-color: #409eff;
 }
 
 :deep(.el-textarea__inner:hover) {
@@ -104,7 +106,7 @@ onMounted(() => {
 
 :deep(.el-textarea__inner:focus) {
   background: rgba(255, 255, 255, 0.05);
-  border-color: #409EFF;
+  border-color: #409eff;
   box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
 }
 
@@ -127,12 +129,12 @@ onMounted(() => {
 }
 
 :deep(.el-button--primary) {
-  background: linear-gradient(45deg, #409EFF, #60ACFF);
+  background: linear-gradient(45deg, #409eff, #60acff);
   border: none;
 }
 
 :deep(.el-button--primary:hover) {
-  background: linear-gradient(45deg, #60ACFF, #409EFF);
+  background: linear-gradient(45deg, #60acff, #409eff);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }

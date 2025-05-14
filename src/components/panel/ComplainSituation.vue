@@ -16,7 +16,7 @@ export default {
     const chart = ref(null)
     let myChart = null
     const loading = ref(false)
-    let timer = null  // 添加定时器变量
+    let timer = null // 添加定时器变量
 
     // 获取数据
     const fetchData = async () => {
@@ -93,7 +93,7 @@ export default {
               { value: data.unhandled, itemStyle: { color: colors[0] } },
               { value: data.handling, itemStyle: { color: colors[1] } },
               { value: data.handled, itemStyle: { color: colors[2] } },
-              { value: data.waiting_callback, itemStyle: { color: colors[3] } }
+              { value: data.waiting_callback, itemStyle: { color: colors[3] } },
             ],
           },
         ],
@@ -112,13 +112,12 @@ export default {
       // 添加自动刷新
       timer = setInterval(() => {
         fetchData()
-      }, 5000)  // 每5秒刷新一次
+      }, 5000) // 每5秒刷新一次
 
       window.addEventListener('resize', () => {
         myChart?.resize()
       })
     })
-
 
     onUnmounted(() => {
       // 清除定时器
