@@ -15,7 +15,7 @@
     </el-upload>
 
     <!-- 轮播图展示 -->
-    <el-carousel v-if="banners.length" class="banner-carousel">
+    <el-carousel v-if="banners.length" class="banner-carousel" type="card">
       <el-carousel-item v-for="banner in banners" :key="banner.id">
         <div class="carousel-item">
           <img :src="banner.banner_image" alt="banner" />
