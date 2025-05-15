@@ -20,13 +20,7 @@
 
       <el-table-column label="操作" width="200">
         <template #default="{ row }">
-          <el-button
-            v-if="row.isEdit"
-            type="success"
-            size="small"
-            @click="savePhone(row)"
-            :loading="loading"
-          >
+          <el-button v-if="row.isEdit" type="success" size="small" @click="savePhone(row)" :loading="loading">
             保存
           </el-button>
           <el-button v-else type="primary" size="small" @click="editPhone(row)"> 修改 </el-button>
@@ -60,10 +54,12 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '../../stores/token.js'
+import { useRouter } from 'vue-router'
 
 const phoneList = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
+const router = useRouter()
 const newPhone = ref({
   phone_name: '',
   phone_number: '',
@@ -86,6 +82,7 @@ const getPhoneList = async () => {
   } catch (error) {
     ElMessage.error('获取电话列表失败')
     console.error('获取电话列表失败:', error)
+    router.push('/login')
   } finally {
     loading.value = false
   }

@@ -1,11 +1,22 @@
+<template>
+  <RouterView />
+</template>
 <script setup>
 import { RouterView } from 'vue-router'
+import { onUnmounted } from 'vue'
+import { useAuthStore } from '@/stores/token'
+
+const authStore = useAuthStore()
+
+onUnmounted(() => {
+  // 清除 token
+  authStore.clearToken()
+})
 </script>
 
 <template>
   <RouterView />
 </template>
-
 <style>
 html,
 body {

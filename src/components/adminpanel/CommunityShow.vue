@@ -6,13 +6,8 @@
         <el-button type="primary" @click="showAddDialog">添加风采</el-button>
       </div>
       <div class="show-list" @scroll="handleScroll" ref="listRef">
-        <div
-          v-for="item in showList"
-          :key="item.id"
-          class="show-item"
-          :class="{ active: currentShow?.id === item.id }"
-          @click="selectShow(item)"
-        >
+        <div v-for="item in showList" :key="item.id" class="show-item" :class="{ active: currentShow?.id === item.id }"
+          @click="selectShow(item)">
           <span class="title">{{ item.title }}</span>
           <el-icon class="delete-icon" @click.stop="deleteShow(item)">
             <Close />
