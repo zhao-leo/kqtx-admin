@@ -37,10 +37,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted,onUnmounted } from 'vue'
 import { UserFilled, Picture, Setting } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { useAuthStore } from '../../stores/token.js'
 
+const token = useAuthStore().getToken()
+axios.defaults.headers.common['Authorization'] = token
+axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
+
+const router = useRouter()
 const activeIndex = ref('/panel/basic')
+let authCheckInterval = null
+const check_api = import.meta.env.VITE_API_BASE_URL+'/user/UserInfo'
+
+const checkAuth = async () => {
+  try {
+    const response = await axios.get(check_api)
+    if (response.data.code !== 200) {
+      router.push('/')
+    }
+  } catch (error) {
+    console.error('权限验证失败:', error)
+    router.push('/')
+  }
+}
+
+onMounted(() => {
+  checkAuth() // 初始检查
+  authCheckInterval = setInterval(checkAuth, 5000) // 每5秒检查一次
+})
+
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  if (authCheckInterval) {
+    clearInterval(authCheckInterval)
+  }
+})
 </script>
 
 <style scoped>

@@ -49,7 +49,7 @@ const handleLogin = async () => {
       const userStore = useAuthStore()
       userStore.setToken(response.data.data.token)
 
-      router.push('/panel')
+      router.push('/dashboard') // 登录成功后跳转到 dashboard 页面
     } else {
       await ElMessageBox.alert(`登录失败：${response.data.message || '未知错误'}`, '错误', {
         confirmButtonText: '确定',
@@ -91,7 +91,7 @@ const handleLogin = async () => {
 }
 
 .login-input {
-  width: 100%;
+  width: 90%;
   height: 40px;
   padding: 0 15px;
   border: 1px solid #dcdfe6;

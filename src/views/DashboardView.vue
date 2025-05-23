@@ -5,7 +5,7 @@
         <h1 class="head-title">矿桥东街社区服务数据管理平台</h1>
         <div class="head-right">
           <button class="login-btn">{{ currentTime }}</button>
-          <button class="login-btn" @click="goToLogin">登录</button>
+          <button class="login-btn" @click="goToLogin">进入管理后台</button>
         </div>
       </div>
     </header>
@@ -42,7 +42,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const goToLogin = () => {
-  router.push('/login')
+  router.push('/panel')
 }
 const currentTime = ref('')
 
