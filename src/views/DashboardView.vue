@@ -38,6 +38,7 @@ import CategoryCount from '@/components/panel/CategoryCount.vue'
 import RecommendHandle from '@/components/panel/RecommendHandle.vue'
 import MiniProgramUsage from '@/components/panel/MiniProgramUsage.vue'
 import { useRouter } from 'vue-router'
+import request from '@/logic/register.js'
 
 const router = useRouter()
 
@@ -58,12 +59,23 @@ const updateTime = () => {
   currentTime.value = `${y}/${mt}/${day} ${h}:${m}:${s}`
 }
 
-let timer
+const checkAuth = async () => {
+  try {
+    await request.get('/user/UserInfo')
+  } catch (error) {
+    console.error('权限验证失败:', error)
+    router.push('/')
+  }
+}
+
+let timer = null
+let authCheckInterval = null
 
 onMounted(() => {
   // 初始化时间
   updateTime()
   // 设置定时器每秒更新时间
+  authCheckInterval = setInterval(checkAuth, 5000) // 每5秒检查一次
   timer = setInterval(updateTime, 1000)
 })
 
@@ -71,6 +83,9 @@ onUnmounted(() => {
   // 清除定时器
   if (timer) {
     clearInterval(timer)
+  }
+  if (authCheckInterval) {
+    clearInterval(authCheckInterval)
   }
 })
 </script>

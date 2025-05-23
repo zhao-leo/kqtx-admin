@@ -56,10 +56,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { useAuthStore } from '../../stores/token.js'
 import { useRouter } from 'vue-router'
+
+import { request } from '@/logic/register'
 
 const router = useRouter()
 const banners = ref([])
@@ -69,23 +69,17 @@ const deleteDialogVisible = ref(false)
 const currentBanner = ref(null)
 
 const IMAGE_BASEURL =
-  import.meta.env.VITE_API_BASE_URL.split('/')[0] +
-  '//' +
-  import.meta.env.VITE_API_BASE_URL.split('/')[2]
-const api = import.meta.env.VITE_API_BASE_URL + '/community/banners'
-const token = useAuthStore().getToken()
-axios.defaults.headers.common['Authorization'] = token
-axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
+  import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
 
 // 获取轮播图列表
 const getBanners = async () => {
   try {
     loading.value = true
-    const response = await axios.get(api)
-    if (response.data.data.length === 0) {
+    const response = await request.get('/community/banners')
+    if (response.data.length === 0) {
       banners.value = []
     } else {
-      banners.value = response.data.data.data.map((banner) => ({
+      banners.value = response.data.data.map((banner) => ({
         ...banner,
         banner_image: IMAGE_BASEURL + banner.banner_image,
       }))
@@ -105,7 +99,7 @@ const uploadFile = async (file) => {
 
   try {
     loading.value = true
-    await axios.post(api, formData)
+    await request.post('/community/banners', formData)
     await getBanners() // 刷新列表
   } catch (error) {
     ElMessage.error('上传失败')
@@ -127,7 +121,7 @@ const confirmDelete = async () => {
 
   try {
     loading.value = true
-    await axios.delete(`${api}?pk=${currentBanner.value.id}`)
+    await request.delete(`/community/banners?pk=${currentBanner.value.id}`)
     await getBanners() // 重新获取列表
     ElMessage.success('删除成功')
   } catch (error) {

@@ -40,24 +40,16 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { UserFilled, Picture, Setting } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
-import { useAuthStore } from '../../stores/token.js'
 
-const token = useAuthStore().getToken()
-axios.defaults.headers.common['Authorization'] = token
-axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
+import { request } from '@/logic/register'
 
 const router = useRouter()
 const activeIndex = ref('/panel/basic')
 let authCheckInterval = null
-const check_api = import.meta.env.VITE_API_BASE_URL + '/user/UserInfo'
 
 const checkAuth = async () => {
   try {
-    const response = await axios.get(check_api)
-    if (response.data.code !== 200) {
-      router.push('/')
-    }
+    await request.get('/user/UserInfo')
   } catch (error) {
     console.error('权限验证失败:', error)
     router.push('/')
