@@ -42,12 +42,22 @@
         <span>报告生成</span>
       </el-menu-item>
     </el-menu-item-group>
+
+      <!-- 返回Dashboard按钮 -->
+    <div class="back-button-container">
+      <el-menu-item index="/dashboard">
+        <el-icon>
+          <Back />
+        </el-icon>
+        <span>返回数据大屏</span>
+      </el-menu-item>
+    </div>
   </el-menu>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { UserFilled, Picture, Setting, Document } from '@element-plus/icons-vue'
+import { UserFilled, Picture, Setting, Document,Back } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 import { request } from '@/logic/register'
@@ -138,5 +148,31 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.5px;
+}
+
+.back-button-container {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+}
+
+.back-button-container .el-menu-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 12px;
+  margin-top: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.back-button-container .el-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.back-button-container .el-icon {
+  color: #f56c6c;
+  margin-right: 8px;
 }
 </style>

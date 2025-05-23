@@ -31,6 +31,13 @@
           {{ formatTime(scope.row.upload_time) }}
         </template>
       </el-table-column>
+      <el-table-column label="操作" width="120" fixed="right">
+        <template #default="scope">
+          <el-button type="danger" size="small" @click.stop="confirmDelete(scope.row)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- Pagination -->
@@ -46,7 +53,16 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-
+    <!-- 删除确认对话框 -->
+    <el-dialog v-model="deleteDialogVisible" title="确认删除" width="30%" destroy-on-close>
+      <div>确定要删除这条表单记录吗？该操作不可撤销。</div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="deleteDialogVisible = false">取消</el-button>
+          <el-button type="danger" @click="deleteForm" :loading="deleting"> 确认删除 </el-button>
+        </span>
+      </template>
+    </el-dialog>
     <!-- Form detail dialog -->
     <el-dialog v-model="dialogVisible" title="表单详情" width="60%" destroy-on-close>
       <div v-if="currentForm" class="form-detail">
@@ -174,6 +190,42 @@ const imageBaseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
 const typeMap = {
   complaint: '投诉',
   suggest: '建议',
+}
+// 在 Data 部分添加
+const deleteDialogVisible = ref(false)
+const currentDeleteForm = ref(null)
+const deleting = ref(false)
+
+// 添加确认删除方法
+const confirmDelete = (row) => {
+  currentDeleteForm.value = row
+  deleteDialogVisible.value = true
+}
+
+// 添加删除表单方法
+const deleteForm = async () => {
+  if (!currentDeleteForm.value) return
+
+  deleting.value = true
+  try {
+    const response = await request.delete(
+      `/proceed/admin_form?uuid=${currentDeleteForm.value.uuidx}`,
+    )
+
+    if (response.code === 200) {
+      ElMessage.success('删除成功')
+      // 刷新表单列表
+      await fetchForms()
+      deleteDialogVisible.value = false
+    } else {
+      ElMessage.error(response.message || '删除失败')
+    }
+  } catch (error) {
+    ElMessage.error('删除失败')
+    console.error('Failed to delete form:', error)
+  } finally {
+    deleting.value = false
+  }
 }
 
 const fetchForms = async () => {
