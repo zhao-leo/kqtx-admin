@@ -14,9 +14,6 @@ onUnmounted(() => {
 })
 </script>
 
-<template>
-  <RouterView />
-</template>
 <style>
 html,
 body {
