@@ -8,7 +8,8 @@
 <script>
 import * as echarts from 'echarts'
 import { onMounted, ref, onUnmounted } from 'vue'
-import axios from 'axios'
+
+import request from '../../logic/register.js'
 
 export default {
   name: 'MiniProgramUsage',
@@ -22,11 +23,9 @@ export default {
     const fetchData = async () => {
       try {
         loading.value = true
-        const api = import.meta.env.VITE_API_BASE_URL + '/analysis/view-stats'
+        const response = await request.get('/analysis/view-stats')
 
-        const response = await axios.get(api)
-
-        const chartData = response.data.data.data.reverse()
+        const chartData = response.data.data.reverse()
         updateChart(chartData)
       } catch (error) {
         console.error('获取数据失败:', error)

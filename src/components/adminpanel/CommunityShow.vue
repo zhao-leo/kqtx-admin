@@ -6,8 +6,13 @@
         <el-button type="primary" @click="showAddDialog">添加风采</el-button>
       </div>
       <div class="show-list" @scroll="handleScroll" ref="listRef">
-        <div v-for="item in showList" :key="item.id" class="show-item" :class="{ active: currentShow?.id === item.id }"
-          @click="selectShow(item)">
+        <div
+          v-for="item in showList"
+          :key="item.id"
+          class="show-item"
+          :class="{ active: currentShow?.id === item.id }"
+          @click="selectShow(item)"
+        >
           <span class="title">{{ item.title }}</span>
           <el-icon class="delete-icon" @click.stop="deleteShow(item)">
             <Close />
@@ -49,9 +54,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { Close, Loading } from '@element-plus/icons-vue'
-import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useAuthStore } from '@/stores/token.js'
+
+import request from '../../logic/register.js'
 
 const showList = ref([])
 const currentShow = ref(null)
@@ -64,21 +69,18 @@ const pageSize = ref(9)
 const hasMore = ref(true)
 const listRef = ref(null)
 
-const api = import.meta.env.VITE_API_BASE_URL + '/community/tweet'
-const token = useAuthStore().getToken()
-axios.defaults.headers.common['Authorization'] = token
-axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
-
 // 获取风采列表
 const getShowList = async (isLoadMore = false) => {
   if (!hasMore.value && isLoadMore) return
 
   try {
     loading.value = true
-    const response = await axios.get(`${api}?page=${currentPage.value}&page_size=${pageSize.value}`)
+    const response = await request.get(
+      `/community/tweet?page=${currentPage.value}&page_size=${pageSize.value}`,
+    )
 
-    const results = response.data.data.results
-    const count = response.data.data.total
+    const results = response.data.results
+    const count = response.data.total
 
     // 判断是否还有更多数据
     hasMore.value = currentPage.value * pageSize.value < count
@@ -92,6 +94,55 @@ const getShowList = async (isLoadMore = false) => {
   } catch (error) {
     ElMessage.error('获取风采列表失败')
     console.error('获取风采列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 添加风采后重置列表
+const addShow = async () => {
+  if (!newshow.value) {
+    ElMessage.warning('请填写完整信息')
+    return
+  }
+
+  try {
+    loading.value = true
+    const formData = new FormData()
+    formData.append('url', newshow.value)
+    await request.post('/community/tweet', formData)
+    ElMessage.success('添加成功')
+    dialogVisible.value = false
+    // 重置分页并重新加载
+    currentPage.value = 1
+    await getShowList()
+  } catch (error) {
+    ElMessage.error('添加失败')
+    console.error('添加失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 删除风采
+const deleteShow = async (show) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这条风采吗？', '提示', {
+      type: 'warning',
+    })
+
+    loading.value = true
+    await request.delete(`/community/tweet?pk=${show.id}`)
+    if (currentShow.value?.id === show.id) {
+      currentShow.value = null
+    }
+    await getShowList()
+    ElMessage.success('删除成功')
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+      console.error('删除失败:', error)
+    }
   } finally {
     loading.value = false
   }
@@ -116,55 +167,6 @@ const selectShow = (show) => {
 const showAddDialog = () => {
   newshow.value = ''
   dialogVisible.value = true
-}
-
-// 添加风采后重置列表
-const addShow = async () => {
-  if (!newshow.value) {
-    ElMessage.warning('请填写完整信息')
-    return
-  }
-
-  try {
-    loading.value = true
-    const formData = new FormData()
-    formData.append('url', newshow.value)
-    await axios.post(api, formData)
-    ElMessage.success('添加成功')
-    dialogVisible.value = false
-    // 重置分页并重新加载
-    currentPage.value = 1
-    await getShowList()
-  } catch (error) {
-    ElMessage.error('添加失败')
-    console.error('添加失败:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-// 删除风采
-const deleteShow = async (show) => {
-  try {
-    await ElMessageBox.confirm('确定要删除这条风采吗？', '提示', {
-      type: 'warning',
-    })
-
-    loading.value = true
-    await axios.delete(`${api}?pk=${show.id}`)
-    if (currentShow.value?.id === show.id) {
-      currentShow.value = null
-    }
-    await getShowList()
-    ElMessage.success('删除成功')
-  } catch (error) {
-    if (error !== 'cancel') {
-      ElMessage.error('删除失败')
-      console.error('删除失败:', error)
-    }
-  } finally {
-    loading.value = false
-  }
 }
 
 // 组件加载时获取风采列表

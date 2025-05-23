@@ -10,23 +10,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { useAuthStore } from '@/stores/token.js'
+
+import request from '../../logic/register.js'
 
 const noticeContent = ref('')
 const loading = ref(false)
-const api = import.meta.env.VITE_API_BASE_URL + '/community/warm_notice'
-const token = useAuthStore().getToken()
-axios.defaults.headers.common['Authorization'] = token
-axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
 
 // 获取温馨提示内容
 const getNotice = async () => {
   try {
     loading.value = true
-    const response = await axios.get(api)
-    noticeContent.value = response.data.data.notice
+    const response = await request.get('/community/warm_notice')
+    noticeContent.value = response.data.notice
   } catch (error) {
     ElMessage.error('获取温馨提示失败')
     console.error('获取温馨提示失败:', error)
@@ -41,7 +37,7 @@ const submitNotice = async () => {
   formdata.append('notice', noticeContent.value)
   try {
     loading.value = true
-    await axios.put(api, formdata)
+    await request.put('/community/warm_notice', formdata)
     ElMessage.success('提交成功')
   } catch (error) {
     ElMessage.error('提交失败')

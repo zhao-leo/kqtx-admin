@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted,onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { UserFilled, Picture, Setting } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
@@ -50,7 +50,7 @@ axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
 const router = useRouter()
 const activeIndex = ref('/panel/basic')
 let authCheckInterval = null
-const check_api = import.meta.env.VITE_API_BASE_URL+'/user/UserInfo'
+const check_api = import.meta.env.VITE_API_BASE_URL + '/user/UserInfo'
 
 const checkAuth = async () => {
   try {

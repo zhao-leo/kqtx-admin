@@ -8,7 +8,8 @@
 <script>
 import * as echarts from 'echarts'
 import { onMounted, ref, onUnmounted } from 'vue'
-import axios from 'axios'
+
+import request from '../../logic/register.js'
 
 export default {
   name: 'CategoryCount',
@@ -22,11 +23,9 @@ export default {
     const fetchData = async () => {
       try {
         loading.value = true
-        const api = import.meta.env.VITE_API_BASE_URL + '/analysis/status'
+        const response = await request.get('/analysis/status')
 
-        const response = await axios.get(api)
-
-        const categories = response.data.data.categories
+        const categories = response.data.categories
         // 将数据转换为图表所需格式
         const chartData = Object.entries(categories).map(([name, value]) => ({
           name,

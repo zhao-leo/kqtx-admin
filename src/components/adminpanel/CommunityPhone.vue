@@ -20,7 +20,13 @@
 
       <el-table-column label="操作" width="200">
         <template #default="{ row }">
-          <el-button v-if="row.isEdit" type="success" size="small" @click="savePhone(row)" :loading="loading">
+          <el-button
+            v-if="row.isEdit"
+            type="success"
+            size="small"
+            @click="savePhone(row)"
+            :loading="loading"
+          >
             保存
           </el-button>
           <el-button v-else type="primary" size="small" @click="editPhone(row)"> 修改 </el-button>
@@ -51,10 +57,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useAuthStore } from '../../stores/token.js'
 import { useRouter } from 'vue-router'
+
+import request from '../../logic/register.js'
 
 const phoneList = ref([])
 const loading = ref(false)
@@ -65,17 +71,13 @@ const newPhone = ref({
   phone_number: '',
 })
 
-const api = import.meta.env.VITE_API_BASE_URL + '/community/phone_number'
-
-const token = useAuthStore().getToken()
-axios.defaults.headers.common['Authorization'] = token
-axios.defaults.headers.common['Content-Type'] = 'multipart/form-data'
 // 获取电话列表
 const getPhoneList = async () => {
   try {
     loading.value = true
-    const response = await axios.get(api)
-    phoneList.value = response.data.data.map((item) => ({
+    const response = await request.get('/community/phone_number')
+
+    phoneList.value = response.data.map((item) => ({
       ...item,
       isEdit: false,
     }))
@@ -83,6 +85,26 @@ const getPhoneList = async () => {
     ElMessage.error('获取电话列表失败')
     console.error('获取电话列表失败:', error)
     router.push('/login')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 添加电话
+const addPhone = async () => {
+  if (!newPhone.value.phone_name || !newPhone.value.phone_number) {
+    ElMessage.warning('请填写完整信息')
+    return
+  }
+  try {
+    loading.value = true
+    await request.post('/community/phone_number', newPhone.value)
+    ElMessage.success('添加成功')
+    dialogVisible.value = false
+    await getPhoneList() // 刷新列表
+  } catch (error) {
+    ElMessage.error('添加失败')
+    console.error('添加失败:', error)
   } finally {
     loading.value = false
   }
@@ -102,8 +124,8 @@ const editPhone = (row) => {
 const savePhone = async (row) => {
   try {
     loading.value = true
-    const apiUrl = `${api}?pk=${row.id}`
-    await axios.put(apiUrl, {
+    const apiUrl = `/community/phone_number?pk=${row.id}`
+    await request.put(apiUrl, {
       phone_name: row.phone_name,
       phone_number: row.phone_number,
     })
@@ -133,8 +155,7 @@ const deletePhone = async (row) => {
     })
 
     loading.value = true
-    const apiUrl = `${api}?pk=${row.id}`
-    await axios.delete(apiUrl)
+    await request.delete(`/community/phone_number?pk=${row.id}`)
     phoneList.value = phoneList.value.filter((item) => item.id !== row.id)
     ElMessage.success('删除成功')
   } catch (error) {
@@ -146,32 +167,14 @@ const deletePhone = async (row) => {
     loading.value = false
   }
 }
+
+// 显示添加电话对话框
 const showAddDialog = () => {
   newPhone.value = {
     phone_name: '',
     phone_number: '',
   }
   dialogVisible.value = true
-}
-
-const addPhone = async () => {
-  if (!newPhone.value.phone_name || !newPhone.value.phone_number) {
-    ElMessage.warning('请填写完整信息')
-    return
-  }
-
-  try {
-    loading.value = true
-    await axios.post(api, newPhone.value)
-    ElMessage.success('添加成功')
-    dialogVisible.value = false
-    await getPhoneList() // 刷新列表
-  } catch (error) {
-    ElMessage.error('添加失败')
-    console.error('添加失败:', error)
-  } finally {
-    loading.value = false
-  }
 }
 
 // 组件加载时获取电话列表

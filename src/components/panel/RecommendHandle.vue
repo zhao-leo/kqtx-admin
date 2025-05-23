@@ -1,18 +1,18 @@
 <template>
   <div class="box">
-    <div class="tit">推荐处理方式</div>
+    <div class="tit">AI推荐</div>
     <div class="boxnav" id="ai_recommend">
       <div class="ai-recommend-container">
         <div class="ai-recommend-list" :style="{ transform: `translateY(${scrollTop}px)` }">
           <!-- 原始列表 -->
           <div v-for="item in recommendations" :key="item.category" class="ai-item">
             <div class="ai-item-category">{{ item.category }}</div>
-            <div class="ai-item-solution">{{ item.solution }}</div>
+            <div class="ai-item-solution">{{ item.solution_summary }}</div>
           </div>
           <!-- 克隆列表用于无缝滚动 -->
           <div v-for="item in recommendations" :key="item.category + '_clone'" class="ai-item">
             <div class="ai-item-category">{{ item.category }}</div>
-            <div class="ai-item-solution">{{ item.solution }}</div>
+            <div class="ai-item-solution">{{ item.solution_summary }}</div>
           </div>
         </div>
       </div>
@@ -21,7 +21,8 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import request from '../../logic/register.js'
 
 export default {
   name: 'RecommendHandle',
@@ -29,53 +30,62 @@ export default {
     const scrollTop = ref(0)
     const scrollHeight = ref(0)
     let timer = null
+    let dataTimer = null
+    const recommendations = ref([])
 
-    const recommendations = [
-      {
-        category: '物业问题',
-        solution: '建议由物业专员处理，预计解决周期: 48小时',
-      },
-      {
-        category: '噪音扰民',
-        solution: '建议由调解员介入，预计解决周期: 72小时',
-      },
-      {
-        category: '安全隐患',
-        solution: '建议由安全专员紧急处理，预计解决周期: 24小时',
-      },
-      {
-        category: '环境卫生',
-        solution: '建议由环卫部门处理，预计解决周期: 36小时',
-      },
-    ]
+    const calculateHeight = () => {
+      const listElement = document.querySelector('.ai-recommend-list')
+      if (listElement && recommendations.value.length > 0) {
+        const items = listElement.querySelectorAll('.ai-item')
+        scrollHeight.value = Array.from(items)
+          .slice(0, recommendations.value.length)
+          .reduce((acc, item) => acc + item.offsetHeight + 15, 0)
+      }
+    }
 
     const startScroll = () => {
-      const speed = 0.5 // 调整滚动速度
+      if (timer) clearInterval(timer)
+      const speed = 0.5
       timer = setInterval(() => {
         scrollTop.value -= speed
-        // 当滚动到第一组列表底部时，重置位置到顶部
+        // 当滚动到底部时重置位置
         if (Math.abs(scrollTop.value) >= scrollHeight.value) {
           scrollTop.value = 0
         }
       }, 30)
     }
 
-    onMounted(() => {
-      // 获取一组列表的高度
-      const listElement = document.querySelector('.ai-recommend-list')
-      if (listElement) {
-        const items = listElement.querySelectorAll('.ai-item')
-        scrollHeight.value = Array.from(items)
-          .slice(0, recommendations.length)
-          .reduce((acc, item) => acc + item.offsetHeight + 15, 0) // 15是gap的值
+    const fetchData = async () => {
+      try {
+        const response = await request.get('/analysis/event')
+        if (response.data && response.data.length > 0) {
+          recommendations.value = response.data
+          // 数据更新后重新计算高度
+          setTimeout(calculateHeight, 100)
+        }
+      } catch (error) {
+        console.error('获取数据失败:', error)
       }
-      startScroll()
+    }
+
+    // 监听数据变化
+    watch(
+      recommendations,
+      () => {
+        calculateHeight()
+        if (!timer) startScroll()
+      },
+      { deep: true },
+    )
+
+    onMounted(async () => {
+      await fetchData()
+      dataTimer = setInterval(fetchData, 5000)
     })
 
     onUnmounted(() => {
-      if (timer) {
-        clearInterval(timer)
-      }
+      if (timer) clearInterval(timer)
+      if (dataTimer) clearInterval(dataTimer)
     })
 
     return {
@@ -125,6 +135,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  transition: transform 0.3s linear; /* 添加平滑过渡效果 */
 }
 
 .ai-item {

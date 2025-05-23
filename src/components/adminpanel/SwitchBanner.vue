@@ -1,9 +1,16 @@
 <template>
   <div class="banner-manager">
     <!-- 上传按钮 -->
-    <el-upload class="upload-section" accept=".jpg,.jpeg,.png" :on-success="handleUploadSuccess"
-      :on-error="handleUploadError" :before-upload="beforeUpload" :show-file-list="false" :drag="true"
-      :http-request="uploadFile">
+    <el-upload
+      class="upload-section"
+      accept=".jpg,.jpeg,.png"
+      :on-success="handleUploadSuccess"
+      :on-error="handleUploadError"
+      :before-upload="beforeUpload"
+      :show-file-list="false"
+      :drag="true"
+      :http-request="uploadFile"
+    >
       <el-button type="primary" :loading="uploading"> 上传新图片 </el-button>
     </el-upload>
 
@@ -13,7 +20,12 @@
         <div class="carousel-item">
           <img :src="banner.banner_image" alt="banner" />
           <div class="banner-actions">
-            <el-button type="danger" size="small" @click.stop="deleteBanner(banner)" :loading="loading">
+            <el-button
+              type="danger"
+              size="small"
+              @click.stop="deleteBanner(banner)"
+              :loading="loading"
+            >
               删除
             </el-button>
           </div>
@@ -24,7 +36,13 @@
     <div v-else class="no-banner">暂无轮播图</div>
 
     <!-- 删除确认对话框 -->
-    <el-dialog v-model="deleteDialogVisible" title="删除确认" width="400px" modal-class="custom-dialog" lock-scroll>
+    <el-dialog
+      v-model="deleteDialogVisible"
+      title="删除确认"
+      width="400px"
+      modal-class="custom-dialog"
+      lock-scroll
+    >
       <p>确定要删除这张图片吗？</p>
       <template #footer>
         <span class="dialog-footer">
