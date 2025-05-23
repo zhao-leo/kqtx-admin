@@ -43,7 +43,7 @@
       </el-menu-item>
     </el-menu-item-group>
 
-      <!-- 返回Dashboard按钮 -->
+    <!-- 返回Dashboard按钮 -->
     <div class="back-button-container">
       <el-menu-item index="/dashboard">
         <el-icon>
@@ -57,7 +57,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { UserFilled, Picture, Setting, Document,Back } from '@element-plus/icons-vue'
+import { UserFilled, Picture, Setting, Document, Back } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 import { request } from '@/logic/register'
