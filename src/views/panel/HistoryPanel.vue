@@ -10,6 +10,7 @@
         end-placeholder="结束日期"
         format="YYYY-MM-DD"
         value-format="YYYY-MM-DD"
+        :disabled-date="disableFutureDates"
       />
       <el-button type="primary" @click="downloadExcel" :loading="downloading">
         下载Excel
@@ -38,7 +39,7 @@
         background
         :current-page="currentPage"
         :page-size="pageSize"
-        :page-sizes="[3, 10, 16, 20, 30]"
+        :page-sizes="[6, 10, 16, 20, 30]"
         :total="total"
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleSizeChange"
@@ -49,6 +50,7 @@
     <!-- Form detail dialog -->
     <el-dialog v-model="dialogVisible" title="表单详情" width="60%" destroy-on-close>
       <div v-if="currentForm" class="form-detail">
+        <!-- 基本信息 -->
         <el-descriptions :column="2" border>
           <el-descriptions-item label="表单编号">
             {{ currentForm.serial_number }}
@@ -56,13 +58,91 @@
           <el-descriptions-item label="类型">
             {{ typeMap[currentForm.type] }}
           </el-descriptions-item>
+          <el-descriptions-item label="类别">
+            {{ currentForm.category }}
+          </el-descriptions-item>
+          <el-descriptions-item label="提交时间">
+            {{ formatTime(currentForm.upload_time) }}
+          </el-descriptions-item>
           <el-descriptions-item label="标题" :span="2">
             {{ currentForm.title }}
           </el-descriptions-item>
-          <el-descriptions-item label="提交时间" :span="2">
-            {{ formatTime(currentForm.upload_time) }}
+        </el-descriptions>
+
+        <!-- 投诉人信息 -->
+        <el-descriptions class="mt-20" :column="2" border>
+          <el-descriptions-item label="投诉人">
+            {{ currentForm.name }}
+          </el-descriptions-item>
+          <el-descriptions-item label="联系电话">
+            {{ currentForm.phone }}
+          </el-descriptions-item>
+          <el-descriptions-item label="地点" :span="2">
+            {{ currentForm.address }}
+          </el-descriptions-item>
+          <el-descriptions-item label="投诉内容" :span="2">
+            {{ currentForm.content }}
           </el-descriptions-item>
         </el-descriptions>
+
+        <!-- 图片展示 -->
+        <div v-if="currentForm.images && currentForm.images.length" class="mt-20">
+          <h3>用户图片：</h3>
+          <div class="image-container">
+            <el-image
+              v-for="(img, index) in currentForm.images"
+              :key="index"
+              :src="imageBaseUrl + img.image"
+              fit="contain"
+              class="detail-image"
+            />
+          </div>
+        </div>
+        <div v-if="currentForm.handle_images && currentForm.handle_images.length" class="mt-20">
+          <h3>管理员图片：</h3>
+          <div class="image-container">
+            <el-image
+              v-for="(img, index) in currentForm.handle_images"
+              :key="index"
+              :src="imageBaseUrl + img.image"
+              fit="contain"
+              class="detail-image"
+            />
+          </div>
+        </div>
+
+        <!-- 处理信息 -->
+        <el-descriptions v-if="currentForm.handle !== 0" class="mt-20" :column="2" border>
+          <el-descriptions-item label="处理人">
+            {{ currentForm.admin_name || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="处理时间">
+            {{ currentForm.handle_time ? formatTime(currentForm.handle_time) : '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="处理方式">
+            {{ currentForm.admin_way || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="联系电话">
+            {{ currentForm.admin_phone || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="处理内容" :span="2">
+            {{ currentForm.admin_content || '暂无' }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 处理状态 -->
+        <div class="status-info mt-20">
+          <el-tag
+            :type="
+              currentForm.handle === 0 ? 'info' : currentForm.handle === 1 ? 'success' : 'warning'
+            "
+          >
+            {{
+              currentForm.handle === 0 ? '未处理' : currentForm.handle === 1 ? '已处理' : '处理中'
+            }}
+          </el-tag>
+          <el-tag v-if="currentForm.feedback_need" type="warning" class="ml-10"> 需要回访 </el-tag>
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -88,6 +168,8 @@ const dialogVisible = ref(false)
 const currentForm = ref(null)
 const dateRange = ref([])
 const downloading = ref(false)
+
+const imageBaseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
 
 const typeMap = {
   complaint: '投诉',
@@ -116,7 +198,7 @@ const fetchForms = async () => {
     console.error('Failed to fetch forms:', error)
   }
 }
-const handleCurrentChange = async (val=1) => {
+const handleCurrentChange = async (val = 1) => {
   console.log('页码改变:', val)
   currentPage.value = val
   await fetchForms()
@@ -131,9 +213,19 @@ const formatTime = (timestamp) => {
   return dayjs.unix(timestamp).tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss')
 }
 
-const handleRowClick = (row) => {
-  currentForm.value = row
-  dialogVisible.value = true
+const handleRowClick = async (row) => {
+  try {
+    const response = await request.get(`/proceed/admin_form?uuid=${row.uuidx}`)
+    if (response.code === 200 && response.data.length > 0) {
+      currentForm.value = response.data[0]
+      dialogVisible.value = true
+    } else {
+      ElMessage.error('获取详细信息失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取详细信息失败')
+    console.error('Failed to fetch form details:', error)
+  }
 }
 
 const downloadExcel = async () => {
@@ -145,15 +237,18 @@ const downloadExcel = async () => {
   downloading.value = true
   try {
     const [startDate, endDate] = dateRange.value
-    const response = await request.get(
-      `/api/proceed/admin_form/export?start_date=${startDate}&end_date=${endDate}`,
-      { responseType: 'blob' },
-    )
+    const dateFormData = {
+      start_time: dayjs(startDate).format('YYYY-MM-DD'),
+      end_time: dayjs(endDate).format('YYYY-MM-DD'),
+    }
+    const response = await request.post(`/proceed/excel_get`, dateFormData, {
+      responseType: 'blob',
+    })
 
     const url = window.URL.createObjectURL(new Blob([response]))
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', `forms_${startDate}_${endDate}.xlsx`)
+    link.setAttribute('download', `导出数据_${startDate}_${endDate}.xlsx`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -167,7 +262,9 @@ const downloadExcel = async () => {
     downloading.value = false
   }
 }
-
+const disableFutureDates = (time) => {
+  return time.getTime() > Date.now()
+}
 // Lifecycle
 onMounted(() => {
   fetchForms()
@@ -193,6 +290,16 @@ onMounted(() => {
   justify-content: flex-end;
   font-size: large;
   gap: 16px;
+  position: relative;
+  z-index: 10; /* 增加z-index使下载区域在上层 */
+}
+
+/* 为下载区域内的按钮和日期选择器添加样式 */
+:deep(.download-section .el-button),
+:deep(.download-section .el-date-editor) {
+  position: relative;
+  z-index: 11;
+  pointer-events: auto !important; /* 确保可点击 */
 }
 
 .pagination-container {
@@ -200,7 +307,8 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   position: relative;
-  z-index: 10; /* 增加z-index确保分页组件在顶层 */
+  z-index: 10;
+  /* 增加z-index确保分页组件在顶层 */
 }
 
 /* 调整分页组件中各元素的层级 */
@@ -212,7 +320,8 @@ onMounted(() => {
 :deep(.el-pagination button) {
   position: relative;
   z-index: 12;
-  pointer-events: auto !important; /* 确保按钮可点击 */
+  pointer-events: auto !important;
+  /* 确保按钮可点击 */
 }
 
 :deep(.el-pagination .el-pager li) {
@@ -226,5 +335,39 @@ onMounted(() => {
   word-wrap: break-word;
   max-height: 300px;
   overflow-y: auto;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.image-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.detail-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.detail-image:hover {
+  transform: scale(1.05);
+}
+
+.status-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 </style>
