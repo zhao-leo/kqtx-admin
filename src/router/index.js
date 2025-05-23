@@ -40,6 +40,11 @@ const router = createRouter({
           name: 'panel-report',
           component: () => import('../views/panel/ReportPanel.vue'),
         },
+        {
+          path: 'history',
+          name: 'panel-history',
+          component: () => import('../views/panel/HistoryPanel.vue'),
+        },
       ],
     },
   ],

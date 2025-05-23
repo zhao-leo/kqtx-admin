@@ -68,8 +68,7 @@ const uploading = ref(false)
 const deleteDialogVisible = ref(false)
 const currentBanner = ref(null)
 
-const IMAGE_BASEURL =
-  import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
+const IMAGE_BASEURL = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
 
 // 获取轮播图列表
 const getBanners = async () => {

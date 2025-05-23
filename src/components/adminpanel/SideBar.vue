@@ -26,6 +26,15 @@
     </el-menu-item-group>
 
     <el-menu-item-group index="3">
+      <el-menu-item index="/panel/history">
+        <el-icon>
+          <Document />
+        </el-icon>
+        <span>历史记录</span>
+      </el-menu-item>
+    </el-menu-item-group>
+
+    <el-menu-item-group index="4">
       <el-menu-item index="/panel/report">
         <el-icon>
           <Setting />
@@ -38,7 +47,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { UserFilled, Picture, Setting } from '@element-plus/icons-vue'
+import { UserFilled, Picture, Setting, Document } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 import { request } from '@/logic/register'
