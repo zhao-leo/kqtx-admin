@@ -51,7 +51,7 @@ const currentTab = ref('qrcode')
 
 .login-bg {
   flex: 1;
-  background: url('@/assets/images/bg3.png') center center no-repeat;
+  background: url('/bg.png') center center no-repeat;
   background-size: cover;
   position: relative;
 }

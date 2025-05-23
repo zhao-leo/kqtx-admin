@@ -32,7 +32,7 @@
 <script>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import request from '../../logic/register.js'
-
+import default_avatar from '../../assets/images/miao.png'
 export default {
   name: 'KeyPeople',
   setup() {
@@ -44,7 +44,7 @@ export default {
 
     // 获取图片完整URL
     const getImageUrl = (avatar) => {
-      if (!avatar) return '../../assets/images/miao.png'
+      if (!avatar) return default_avatar
       const base_url = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
       return `${base_url}${avatar}`
     }
