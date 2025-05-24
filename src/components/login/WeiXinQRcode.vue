@@ -5,10 +5,16 @@
     </div>
     <div v-else class="qrcode-wrapper">
       <div class="qrcode-box">
-        <img :src="qrcodeUrl" alt="登录二维码" class="custom-qrcode" v-if="qrcodeUrl" />
+        <div class="qrcode-container" :class="{ 'qrcode-expired': isExpired }">
+          <img :src="qrcodeUrl" alt="登录二维码" class="custom-qrcode" v-if="qrcodeUrl" />
+          <div v-if="isExpired" class="expired-overlay">
+            <span>二维码已过期</span>
+            <button @click="refreshQRCode" class="refresh-button">点击刷新</button>
+          </div>
+        </div>
       </div>
-      <p class="qrcode-tip">请使用微信扫描二维码登录</p>
-      <p class="qrcode-refresh" @click="refreshQRCode">二维码已失效？点击刷新</p>
+      <p class="qrcode-tip">{{ isExpired ? '二维码已过期，请刷新' : '请使用微信扫描二维码登录' }}</p>
+      <p class="qrcode-refresh" @click="refreshQRCode">{{ isExpired ? '点击刷新' : '二维码已失效？点击刷新' }}</p>
     </div>
   </div>
 </template>
@@ -22,6 +28,7 @@ const router = useRouter()
 const isLoading = ref(false)
 const qrcodeUrl = ref('')
 const salt = ref('')
+const isExpired = ref(false)
 // 添加一个控制变量以防止组件卸载后的操作
 const isComponentMounted = ref(true)
 // 添加一个变量存储轮询定时器的ID
@@ -37,6 +44,9 @@ const fetchQRCode = async () => {
 
   // 停止已有的轮询
   stopPolling()
+
+  // 重置过期状态
+  isExpired.value = false
 
   isLoading.value = true
   try {
@@ -90,6 +100,9 @@ const startPolling = () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/web_login?salt=${salt.value}`)
 
+      // 打印响应内容到控制台
+      console.log('轮询响应:', response.data.data)
+
       // 如果已登录成功
       if (response.data.success) {
         // 停止轮询
@@ -105,6 +118,12 @@ const startPolling = () => {
           // 跳转到首页或控制台
           router.push('/dashboard')
         }
+      }
+      // 处理二维码过期情况
+      else if (response.data.data.code === 'expired') {
+        console.log('二维码已过期，请刷新', response.data.data)
+        isExpired.value = true
+        stopPolling()
       }
     } catch (error) {
       // 网络错误或后端接口错误，可以选择忽略或记录日志
@@ -150,7 +169,6 @@ onBeforeUnmount(() => {
 })
 </script>
 
-
 <style scoped>
 .qrcode-login {
   width: 320px;
@@ -172,11 +190,53 @@ onBeforeUnmount(() => {
   position: relative;
   overflow: hidden;
   display: flex;
-  /* 添加这行 */
   justify-content: center;
-  /* 添加这行 */
   align-items: center;
-  /* 添加这行 */
+}
+
+.qrcode-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.qrcode-expired .custom-qrcode {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.expired-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 4px;
+}
+
+.expired-overlay span {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.refresh-button {
+  padding: 6px 12px;
+  background-color: #409eff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.refresh-button:hover {
+  background-color: #66b1ff;
 }
 
 /* 调整iframe大小 */
