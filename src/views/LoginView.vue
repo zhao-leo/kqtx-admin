@@ -78,7 +78,7 @@ const currentTab = ref('qrcode')
 }
 
 .login-container {
-  width: 480px;
+  width: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,6 +94,7 @@ const currentTab = ref('qrcode')
   display: flex;
   margin-bottom: 24px;
   border-bottom: 1px solid #e4e7ed;
+  justify-content: center;
 }
 
 .tab-item {
