@@ -24,6 +24,7 @@ const router = useRouter()
 const username = ref('')
 const password = ref('')
 const BASEURL = import.meta.env.VITE_API_BASE_URL || ''
+const userStore = useAuthStore()
 
 const handleLogin = async () => {
   if (!username.value || !password.value) {
@@ -46,7 +47,15 @@ const handleLogin = async () => {
     })
 
     if (response.data.message === 'success') {
-      const userStore = useAuthStore()
+      userStore.clearToken()
+      if (response.data.data.permission < 1) {
+        // 如果权限不足，提示用户
+        ElMessageBox.alert('您的权限不足，请联系管理员', '权限不足', {
+          confirmButtonText: '确定',
+          type: 'warning',
+        })
+        return
+      }
       userStore.setToken(response.data.data.token)
 
       router.push('/dashboard') // 登录成功后跳转到 dashboard 页面

@@ -27,6 +27,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/token'
+import { ElMessageBox } from 'element-plus'
 
 const router = useRouter()
 const isLoading = ref(false)
@@ -37,6 +39,7 @@ const isExpired = ref(false)
 const isComponentMounted = ref(true)
 // 添加一个变量存储轮询定时器的ID
 const pollInterval = ref(null)
+const authStore = useAuthStore()
 
 // 生成随机 salt 的函数
 const generateSalt = () => {
@@ -110,13 +113,24 @@ const startPolling = () => {
       )
 
       // 如果已登录成功
+      authStore.clearToken()
       // 处理登录成功逻辑，例如保存 token 并跳转
       if (response.data.data.token) {
+        if (response.data.data.permission < 1) {
+          // 如果权限不足，提示用户
+          isExpired.value = true
+          ElMessageBox.alert('您的权限不足，请联系管理员', '权限不足', {
+            confirmButtonText: '确定',
+            type: 'warning',
+          })
+          stopPolling()
+
+          return
+        }
         // 假设您使用 Pinia 存储 token
         stopPolling()
 
-        const { useAuthStore } = await import('@/stores/token')
-        const authStore = useAuthStore()
+        authStore.clearToken()
         authStore.setToken(response.data.data.token)
 
         // 跳转到首页或控制台
