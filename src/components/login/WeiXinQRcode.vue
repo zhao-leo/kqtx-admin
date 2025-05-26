@@ -109,11 +109,7 @@ const startPolling = () => {
         `${import.meta.env.VITE_API_BASE_URL}/user/web_login?salt=${salt.value}`,
       )
 
-      // 打印响应内容到控制台
-      console.log('轮询响应:', response.data.data)
-
       // 如果已登录成功
-
       // 处理登录成功逻辑，例如保存 token 并跳转
       if (response.data.data.token) {
         // 假设您使用 Pinia 存储 token
@@ -128,14 +124,13 @@ const startPolling = () => {
       }
       // 处理二维码过期情况
       else if (response.data.data.code === 'expired') {
-        console.log('二维码已过期，请刷新', response.data.data)
         isExpired.value = true
         stopPolling()
       }
     } catch (error) {
       // 网络错误或后端接口错误，可以选择忽略或记录日志
       if (isComponentMounted.value) {
-        console.log('检查登录状态出错:', error)
+        console.error('检查登录状态出错:', error)
       }
     }
   }, 1000) // 每秒轮询一次
