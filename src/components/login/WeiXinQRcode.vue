@@ -4,51 +4,168 @@
       <img src="@/assets/images/loading.gif" alt="加载中" class="loading-img" />
     </div>
     <div v-else class="qrcode-wrapper">
-      <div id="wx-qrcode" class="qrcode-box">
-        <!-- 微信二维码将在这里显示 -->
+      <div class="qrcode-box">
+        <div class="qrcode-container" :class="{ 'qrcode-expired': isExpired }">
+          <img :src="qrcodeUrl" alt="登录二维码" class="custom-qrcode" v-if="qrcodeUrl" />
+          <div v-if="isExpired" class="expired-overlay">
+            <span>二维码已过期</span>
+            <button @click="refreshQRCode" class="refresh-button">点击刷新</button>
+          </div>
+        </div>
       </div>
-      <p class="qrcode-tip">请使用微信扫描二维码登录</p>
-      <p class="qrcode-refresh" @click="refreshQRCode">二维码已失效？点击刷新</p>
+      <p class="qrcode-tip">{{ isExpired ? '二维码已过期，请刷新' : '请使用微信扫描二维码登录' }}</p>
+      <p class="qrcode-refresh" @click="refreshQRCode">{{ isExpired ? '点击刷新' : '二维码已失效？点击刷新' }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const isLoading = ref(false)
-const wx_appid = import.meta.env.VITE_WX_APPID
-const initWxLogin = () => {
-  if (typeof window.WxLogin === 'undefined') {
-    console.error('微信登录 SDK 未加载')
-    return
-  }
+const qrcodeUrl = ref('')
+const salt = ref('')
+const isExpired = ref(false)
+// 添加一个控制变量以防止组件卸载后的操作
+const isComponentMounted = ref(true)
+// 添加一个变量存储轮询定时器的ID
+const pollInterval = ref(null)
+
+// 生成随机 salt 的函数
+const generateSalt = () => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+}
+
+const fetchQRCode = async () => {
+  if (!isComponentMounted.value) return
+
+  // 停止已有的轮询
+  stopPolling()
+
+  // 重置过期状态
+  isExpired.value = false
 
   isLoading.value = true
   try {
-    new window.WxLogin({
-      self_redirect: false,
-      id: 'wx-qrcode',
-      appid: wx_appid,
-      scope: 'snsapi_login',
-      redirect_uri: encodeURIComponent('http://localhost:8000/redirect'),
-      state: 'STATE',
-      style: 'black',
+    // 生成新的 salt
+    salt.value = generateSalt()
+
+    // 在 URL 中添加 salt 参数
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/qrcode?salt=${salt.value}`, {
+      responseType: 'blob'
     })
+
+    // 确保组件仍然挂载
+    if (!isComponentMounted.value) {
+      return
+    }
+
+    // 将二进制数据转换为 Blob URL
+    const blob = new Blob([response.data], { type: 'image/png' })
+
+    // 先清理之前的 URL
+    if (qrcodeUrl.value) {
+      URL.revokeObjectURL(qrcodeUrl.value)
+    }
+
+    qrcodeUrl.value = URL.createObjectURL(blob)
+
+    // 开始轮询检查登录状态
+    startPolling()
   } catch (error) {
-    console.error('初始化微信登录失败:', error)
+    if (isComponentMounted.value) {
+      console.error('获取二维码失败:', error)
+    }
   } finally {
-    isLoading.value = false
+    if (isComponentMounted.value) {
+      isLoading.value = false
+    }
+  }
+}
+
+// 开始轮询检查登录状态
+const startPolling = () => {
+  if (!isComponentMounted.value) return
+
+  // 每秒检查一次登录状态
+  pollInterval.value = setInterval(async () => {
+    if (!isComponentMounted.value) {
+      stopPolling()
+      return
+    }
+
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/web_login?salt=${salt.value}`)
+
+      // 打印响应内容到控制台
+      console.log('轮询响应:', response.data.data)
+
+      // 如果已登录成功
+      if (response.data.success) {
+        // 停止轮询
+        stopPolling()
+
+        // 处理登录成功逻辑，例如保存 token 并跳转
+        if (response.data.token) {
+          // 假设您使用 Pinia 存储 token
+          const { useAuthStore } = await import('@/stores/token')
+          const authStore = useAuthStore()
+          authStore.setToken(response.data.token)
+
+          // 跳转到首页或控制台
+          router.push('/dashboard')
+        }
+      }
+      // 处理二维码过期情况
+      else if (response.data.data.code === 'expired') {
+        console.log('二维码已过期，请刷新', response.data.data)
+        isExpired.value = true
+        stopPolling()
+      }
+    } catch (error) {
+      // 网络错误或后端接口错误，可以选择忽略或记录日志
+      if (isComponentMounted.value) {
+        console.log('检查登录状态出错:', error)
+      }
+    }
+  }, 1000) // 每秒轮询一次
+}
+
+// 停止轮询
+const stopPolling = () => {
+  if (pollInterval.value) {
+    clearInterval(pollInterval.value)
+    pollInterval.value = null
   }
 }
 
 const refreshQRCode = () => {
-  isLoading.value = true
-  initWxLogin()
+  // 释放之前的 Blob URL 以避免内存泄漏
+  if (qrcodeUrl.value) {
+    URL.revokeObjectURL(qrcodeUrl.value)
+    qrcodeUrl.value = ''
+  }
+  fetchQRCode()
 }
 
 onMounted(() => {
-  initWxLogin()
+  isComponentMounted.value = true
+  fetchQRCode()
+})
+
+// 组件销毁时清理资源
+onBeforeUnmount(() => {
+  isComponentMounted.value = false
+  stopPolling()
+
+  // 确保清理所有资源
+  if (qrcodeUrl.value) {
+    URL.revokeObjectURL(qrcodeUrl.value)
+    qrcodeUrl.value = ''
+  }
 })
 </script>
 
@@ -73,11 +190,53 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   display: flex;
-  /* 添加这行 */
   justify-content: center;
-  /* 添加这行 */
   align-items: center;
-  /* 添加这行 */
+}
+
+.qrcode-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.qrcode-expired .custom-qrcode {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.expired-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 4px;
+}
+
+.expired-overlay span {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.refresh-button {
+  padding: 6px 12px;
+  background-color: #409eff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.refresh-button:hover {
+  background-color: #66b1ff;
 }
 
 /* 调整iframe大小 */
@@ -118,5 +277,11 @@ onMounted(() => {
 .loading-img {
   width: 32px;
   height: 32px;
+}
+
+.custom-qrcode {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
 }
 </style>
