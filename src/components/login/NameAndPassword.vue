@@ -3,7 +3,7 @@
     <div class="form-header">账号密码登录</div>
     <div class="form-content">
       <div class="input-group">
-        <input type="text" v-model="username" placeholder="请输入用户名" class="login-input" />
+        <input type="text" v-model="username" placeholder="请输入电话" class="login-input" />
       </div>
       <div class="input-group">
         <input type="password" v-model="password" placeholder="请输入密码" class="login-input" />
@@ -27,7 +27,7 @@ const BASEURL = import.meta.env.VITE_API_BASE_URL || ''
 
 const handleLogin = async () => {
   if (!username.value || !password.value) {
-    ElMessageBox.alert('请输入用户名和密码', '提示', {
+    ElMessageBox.alert('请输入电话和密码', '提示', {
       confirmButtonText: '确定',
       type: 'warning',
     })
@@ -36,10 +36,10 @@ const handleLogin = async () => {
 
   try {
     const formData = new FormData()
-    formData.append('openid', password.value) // 使用 password 作为 openid
-    formData.append('username', username.value)
+    formData.append('password', password.value)
+    formData.append('phone', username.value)
 
-    const response = await axios.post(`${BASEURL}/user/test`, formData, {
+    const response = await axios.post(`${BASEURL}/user/UserInfo`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

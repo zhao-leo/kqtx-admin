@@ -61,7 +61,10 @@ const updateTime = () => {
 
 const checkAuth = async () => {
   try {
-    await request.get('/user/UserInfo')
+    const res = await request.get('/user/UserInfo')
+    if (res.code !== 200) {
+      throw new Error('权限验证失败')
+    }
   } catch (error) {
     console.error('权限验证失败:', error)
     router.push('/')
