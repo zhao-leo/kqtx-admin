@@ -13,8 +13,12 @@
           </div>
         </div>
       </div>
-      <p class="qrcode-tip">{{ isExpired ? '二维码已过期，请刷新' : '请使用微信扫描二维码登录' }}</p>
-      <p class="qrcode-refresh" @click="refreshQRCode">{{ isExpired ? '点击刷新' : '二维码已失效？点击刷新' }}</p>
+      <p class="qrcode-tip">
+        {{ isExpired ? '二维码已过期，请刷新' : '请使用微信扫描二维码登录' }}
+      </p>
+      <p class="qrcode-refresh" @click="refreshQRCode">
+        {{ isExpired ? '点击刷新' : '二维码已失效？点击刷新' }}
+      </p>
     </div>
   </div>
 </template>
@@ -54,9 +58,12 @@ const fetchQRCode = async () => {
     salt.value = generateSalt()
 
     // 在 URL 中添加 salt 参数
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/qrcode?salt=${salt.value}`, {
-      responseType: 'blob'
-    })
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/user/qrcode?salt=${salt.value}`,
+      {
+        responseType: 'blob',
+      },
+    )
 
     // 确保组件仍然挂载
     if (!isComponentMounted.value) {
@@ -98,26 +105,26 @@ const startPolling = () => {
     }
 
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/web_login?salt=${salt.value}`)
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/user/web_login?salt=${salt.value}`,
+      )
 
       // 打印响应内容到控制台
       console.log('轮询响应:', response.data.data)
 
       // 如果已登录成功
-      if (response.data.success) {
-        // 停止轮询
+
+      // 处理登录成功逻辑，例如保存 token 并跳转
+      if (response.data.data.token) {
+        // 假设您使用 Pinia 存储 token
         stopPolling()
 
-        // 处理登录成功逻辑，例如保存 token 并跳转
-        if (response.data.token) {
-          // 假设您使用 Pinia 存储 token
-          const { useAuthStore } = await import('@/stores/token')
-          const authStore = useAuthStore()
-          authStore.setToken(response.data.token)
+        const { useAuthStore } = await import('@/stores/token')
+        const authStore = useAuthStore()
+        authStore.setToken(response.data.data.token)
 
-          // 跳转到首页或控制台
-          router.push('/dashboard')
-        }
+        // 跳转到首页或控制台
+        router.push('/dashboard')
       }
       // 处理二维码过期情况
       else if (response.data.data.code === 'expired') {
