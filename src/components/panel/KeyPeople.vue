@@ -45,8 +45,7 @@ export default {
     // 获取图片完整URL
     const getImageUrl = (avatar) => {
       if (!avatar) return default_avatar
-      const base_url = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
-      return `${base_url}${avatar}`
+      return avatar
     }
 
     const calculateHeight = () => {

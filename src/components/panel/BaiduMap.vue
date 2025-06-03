@@ -6,7 +6,7 @@
 
 <script>
 import request from '../../logic/register.js'
-
+import default_avatar from '../../assets/images/miao.png'
 /* eslint-disable no-undef */
 export default {
   name: 'BaiduMap',
@@ -45,7 +45,8 @@ export default {
       // 创建Map实例
       this.map = new BMap.Map(this.$refs.map)
       // 初始化地图,设置中心点坐标和地图级别
-      this.map.centerAndZoom(new BMap.Point(116.397128, 39.916527), 13)
+      this.map.centerAndZoom(new BMap.Point(116.0881762, 39.95214696), 15)
+      // 116.0881762° (N)，纬度为39.95214696°
       this.map.setCurrentCity('北京')
       this.map.enableScrollWheelZoom(true)
 
@@ -58,9 +59,8 @@ export default {
 
     // 获取图片完整URL
     getImageUrl(avatar) {
-      if (!avatar) return ''
-      const base_url = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
-      return `${base_url}${avatar}`
+      if (!avatar) return default_avatar
+      return avatar
     },
 
     // 更新标记点
@@ -73,7 +73,8 @@ export default {
 
       // 添加新的标记点
       data.forEach((item) => {
-        const [lng, lat] = item.Latitude_Longitude.split(',').map(Number)
+        if (!item.Latitude_Longitude) return // 跳过没有经纬度的项
+        const [lat, lng] = item.Latitude_Longitude.split(',').map(Number) //40.15911,116.28745
         const pt = new BMap.Point(lng, lat)
 
         // 创建自定义图标
