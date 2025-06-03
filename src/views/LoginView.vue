@@ -30,6 +30,10 @@
         </div>
       </div>
     </div>
+    <!-- 添加ICP备案信息 -->
+    <div class="icp-footer">
+      <a :href="icpLink" target="_blank" rel="noopener noreferrer"> 京ICP备{{ icpNumber }}号 </a>
+    </div>
   </div>
 </template>
 
@@ -39,6 +43,11 @@ import NameAndPassword from '@/components/login/NameAndPassword.vue'
 import WeiXinQRcode from '@/components/login/WeiXinQRcode.vue'
 
 const currentTab = ref('qrcode')
+
+// 从环境变量读取ICP备案号
+const icpNumber = import.meta.env.VITE_ICP_NUMBER || 'XXXXXXXX'
+// 工信部备案管理系统网址
+const icpLink = 'https://beian.miit.gov.cn/'
 </script>
 
 <style scoped>
@@ -47,6 +56,7 @@ const currentTab = ref('qrcode')
   height: 100vh;
   display: flex;
   background-color: #f0f2f5;
+  position: relative; /* 添加相对定位，用于绝对定位页脚 */
 }
 
 .login-bg {
@@ -124,5 +134,26 @@ const currentTab = ref('qrcode')
   display: flex;
   justify-content: center;
   padding-top: 20px;
+}
+.icp-footer {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+
+.icp-footer a {
+  color: rgba(0, 0, 0, 0.45);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.icp-footer a:hover {
+  color: #409eff;
 }
 </style>
