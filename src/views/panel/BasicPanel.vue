@@ -16,6 +16,11 @@
           <WarmNotice />
         </transition>
       </el-tab-pane>
+      <el-tab-pane label="动态验证码">
+        <transition name="fade-slide">
+          <OTPCode />
+        </transition>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -24,6 +29,7 @@
 import CommunityPhone from '@/components/adminpanel/CommunityPhone.vue'
 import SwitchBanner from '@/components/adminpanel/SwitchBanner.vue'
 import WarmNotice from '@/components/adminpanel/WarmNotice.vue'
+import OTPCode from '@/components/adminpanel/OTPCode.vue'
 </script>
 
 <style scoped>
