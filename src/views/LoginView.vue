@@ -32,7 +32,7 @@
     </div>
     <!-- 添加ICP备案信息 -->
     <div class="icp-footer">
-      <a :href="icpLink" target="_blank" rel="noopener noreferrer"> 京ICP备{{ icpNumber }}号 </a>
+      <a :href="icpLink" target="_blank" rel="noopener noreferrer"> {{ icpNumber }} </a>
     </div>
   </div>
 </template>
